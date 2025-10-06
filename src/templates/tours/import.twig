@@ -1,0 +1,61 @@
+{% extends "_layouts/cp" %}
+{% import "_includes/forms" as forms %}
+
+{% set title = "Import Tours"|t('boarding') %}
+
+{% requirePermission 'boarding:createtours' %}
+
+{% block content %}
+<div class="boarding-plugin">
+    <form method="post" accept-charset="UTF-8" enctype="multipart/form-data">
+        {{ csrfInput() }}
+        {{ actionInput('boarding/import/import-tours') }}
+        {{ redirectInput('boarding/tours') }}
+
+        <div class="field first">
+            <div class="heading">
+                <label>{{ "Import File"|t('boarding') }}</label>
+                <div class="instructions">
+                    <p>{{ "Upload a JSON file that was exported from the Boarding plugin."|t('boarding') }}</p>
+                </div>
+            </div>
+            <div class="input">
+                <input type="file" name="importFile" accept=".json" required>
+            </div>
+        </div>
+
+        <div class="buttons">
+            <button type="submit" class="btn submit">{{ "Import Tours"|t('boarding') }}</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% js %}
+$(document).ready(function() {
+    $('form').on('submit', function(e) {
+        var fileInput = $('input[type="file"]')[0];
+        if (!fileInput.files.length) {
+            e.preventDefault();
+            Craft.cp.displayError('{{ "Please select a file to import."|t('boarding') }}');
+            return false;
+        }
+        
+        var file = fileInput.files[0];
+        if (file.size > 10 * 1024 * 1024) {
+            e.preventDefault();
+            Craft.cp.displayError('{{ "File is too large. Maximum size is 10MB."|t('boarding') }}');
+            return false;
+        }
+        
+        if (!file.name.endsWith('.json')) {
+            e.preventDefault();
+            Craft.cp.displayError('{{ "Please select a JSON file."|t('boarding') }}');
+            return false;
+        }
+        
+        // Show loading indicator
+        $(this).find('button[type="submit"]').addClass('loading');
+    });
+});
+{% endjs %} 

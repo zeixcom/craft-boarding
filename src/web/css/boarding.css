@@ -1,0 +1,369 @@
+/**
+ * Boarding module for Craft CMS
+ * Scoped to prevent affecting other parts of the control panel
+ */
+
+/* :root {
+    --boarding-primary-color: #0b69a3;
+    --boarding-secondary-color: #6c757d;
+    --boarding-success-color: #27ae60;
+    --boarding-warning-color: #f39c12;
+    --boarding-danger-color: #e74c3c;
+    --boarding-info-color: #17a2b8;
+    --boarding-light-color: #f8f9fa;
+    --boarding-dark-color: #343a40;
+    --boarding-border-color: #e3e5e8;
+    --boarding-text-color: #596673;
+    --boarding-text-color-light: #606d7b;
+    --boarding-background-color: #ffffff;
+    --boarding-background-color-secondary: #f8f9fa;
+    --boarding-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --boarding-border-radius: 4px;
+    --boarding-spacing-xs: 5px;
+    --boarding-spacing-md: 15px;
+    --boarding-spacing-lg: 20px;
+    --boarding-spacing-xl: 30px;
+    --boarding-button-padding: 8px 16px;
+    --boarding-button-border-radius: 4px;
+    --boarding-menu-max-width: 400px;
+} */
+
+.boarding-plugin  .field-layout .field-layout-column {
+    width: 100%;
+}
+
+/* Tour button */
+.boarding-plugin .boarding-tours-button,
+.boarding-tours-button {
+    /* Header position */
+    margin-left: 10px;
+}
+
+/* Sidebar button styles */
+#global-sidebar .boarding-tours-button {
+    margin: 0;
+}
+
+#global-sidebar .boarding-tours-button .icon {
+    margin-right: var(--boarding-spacing-sm, 10px);
+    opacity: 0.8;
+}
+
+#global-sidebar .boarding-tours-button .icon svg {
+    display: block;
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+
+#global-sidebar .boarding-tours-button .label {
+    flex: 1;
+}
+
+/* Tours menu */
+.boarding-plugin .boarding-tours-menu,
+.boarding-tours-menu {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--boarding-background-color, #fff);
+    border-radius: 5px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    width: 400px;
+    max-width: 90vw;
+    max-height: 80vh;
+    overflow-y: auto;
+    z-index: 10000000;
+}
+
+.boarding-plugin .boarding-tours-menu-header {
+    padding: 15px;
+    border-bottom: 1px solid var(--boarding-border-color, #e3e5e8);
+}
+
+.boarding-plugin .boarding-tours-menu-header h2 {
+    margin: 0;
+    font-size: 18px;
+    color: var(--boarding-text-color, #333);
+}
+
+.boarding-plugin .boarding-tours-menu-items {
+    padding: 15px;
+}
+
+.boarding-plugin .boarding-tour-item {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e3e5e8;
+}
+
+.boarding-plugin .boarding-tour-item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.boarding-plugin .boarding-tour-item h3 {
+    margin: 0 0 10px;
+    font-size: 16px;
+    color: var(--boarding-text-color, #333);
+}
+
+.boarding-plugin .boarding-tour-item p {
+    margin: 0 0 15px;
+    color: var(--boarding-text-color-light, #606d7b);
+}
+
+.boarding-plugin .boarding-tours-menu-close,
+.boarding-tours-menu-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--boarding-text-color-light, #606d7b);
+}
+
+/* Tour steps */
+.boarding-plugin .boarding-tour-step {
+    max-width: var(--boarding-tour-max-width, 400px);
+}
+
+/* Tour edit page */
+.boarding-plugin .tour-step {
+    flex-direction: column;
+    margin-bottom: 20px;
+    border: 1px solid #e3e5e8;
+    border-radius: 5px;
+}
+
+.boarding-plugin .tour-step .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background-color: #f3f7fc;
+    border-bottom: 1px solid #e3e5e8;
+    border-radius: 5px 5px 0 0;
+}
+
+.boarding-plugin .tour-step .card-header .js-add-step-above span,
+.boarding-plugin .tour-step .card-header .js-add-step-below span {
+    margin: 0;
+}
+
+.boarding-plugin .tour-step .card-header h4 {
+    margin: 0;
+    color: var(--boarding-text-color, #333);
+}
+
+.boarding-plugin .card-body {
+    padding: 15px;
+}
+
+/* Tours list page */
+.boarding-plugin .boarding-tours-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.boarding-plugin .boarding-tour-card {
+    border: 1px solid #e3e5e8;
+    border-radius: 5px;
+}
+
+.boarding-plugin .boarding-tour-card-header {
+    padding: 15px;
+    background-color: #f3f7fc;
+    border-bottom: 1px solid #e3e5e8;
+    border-radius: 5px 5px 0 0;
+}
+
+.boarding-plugin .boarding-tour-card-header h3 {
+    margin: 0;
+    font-size: 16px;
+    color: var(--boarding-text-color, #333);
+}
+
+.boarding-plugin .boarding-tour-card-body {
+    padding: 15px;
+}
+
+.boarding-plugin .boarding-tour-card-body p {
+    margin: 0 0 10px;
+    color: var(--boarding-text-color, #333);
+}
+
+.boarding-plugin .boarding-tour-card-actions {
+    padding: 15px;
+    border-top: 1px solid #e3e5e8;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.boarding-plugin .btn.js-delete-step [data-icon] {
+    margin-right: 0;
+    margin-left: 0;
+    margin-block-start: 0;
+    margin-inline-end: 0;
+}
+
+/* Add some spacing between buttons */
+.boarding-plugin .boarding-tour-card-actions form {
+    margin-right: 5px;
+}
+
+.boarding-plugin .boarding-tour-card-actions form:last-child,
+.boarding-plugin .boarding-tour-card-actions .btn:last-child {
+    margin-right: 0;
+} 
+
+.boarding-plugin .card-actions {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+}
+
+.boarding-plugin .completion-count {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    color: #0d78f2;
+}
+
+.boarding-plugin .completion-count:hover .completion-details,
+.boarding-plugin .completion-count:focus-within .completion-details {
+    display: block;
+}
+
+.boarding-plugin .completion-details {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 100;
+    background: #fff;
+    border: 1px solid #e3e5e8;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: #29323d;
+    min-width: 300px;
+    max-width: 400px;
+    max-height: 400px;
+    overflow-y: auto;
+    margin-top: 4px;
+    padding: 10px;
+}
+
+.boarding-plugin .completion-user {
+    padding: 5px 0;
+    border-bottom: 1px solid #e3e5e8;
+}
+
+.boarding-plugin .completion-user:last-child {
+    border-bottom: none;
+}
+
+.boarding-plugin .element-meta {
+    color: #8f98a3;
+    font-size: 12px;
+    margin-top: 2px;
+}
+
+.boarding-plugin .inline-form {
+    display: inline;
+}
+
+.boarding-plugin .btngroup {
+    display: flex;
+    gap: 4px;
+}
+
+.boarding-plugin .btngroup .btn {
+    margin: 0;
+}
+
+.boarding-plugin .boarding-tour-item.completed h3 {
+    color: #27ae60;
+}
+
+.boarding-plugin .completed-icon {
+    color: #27ae60;
+    margin-left: 5px;
+    font-weight: bold;
+}
+
+.boarding-plugin .two-column-field {
+    display: flex;
+    gap: 20px;
+}
+
+.boarding-plugin .two-column-field .field {
+    flex: 1;
+}
+
+.boarding-plugin .boarding-progress-indicator {
+    display: inline-block;
+    padding: 5px 10px;
+    color: var(--boarding-text-color-light, #606d7b);
+}
+
+/* Header progress indicator */
+.boarding-plugin .boarding-header-progress {
+    margin-right: auto;
+    margin-left: 10px;
+    color: var(--boarding-text-color-light, #606d7b);
+}
+
+/* Footer progress indicator */
+.boarding-plugin .boarding-footer-progress {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-right: auto;
+    padding: 5px 0;
+}
+
+.boarding-plugin .boarding-tours-step .boarding-progress-indicator {
+    display: block;
+}
+
+.boarding-plugin .step-language-content {
+    margin-top: 14px;
+}
+
+.boarding-plugin .step-language-content.hidden {
+    display: none;
+}
+
+.boarding-plugin .tour-step .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.boarding-plugin .tour-step .card-actions {
+    display: flex;
+    gap: 4px;
+}
+
+.boarding-plugin .tour-step .move.icon {
+    cursor: move;
+    margin-right: 4px;
+}
+
+.boarding-plugin .navigation-fields {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #e3e5e8;
+}
+
+.boarding-plugin .tour-validation-error {
+    margin-top: 24px;
+}

@@ -1,0 +1,14 @@
+vendor/
+tests/_output/
+tests/_screenshots/
+tests/_data/
+tests/_support/
+tests/_bootstrap.php
+tests/_bootstrap.php
+
+
+storage/
+DEV_README.md
+node_modules/
+
+.cursor/

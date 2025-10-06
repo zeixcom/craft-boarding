@@ -1,0 +1,28 @@
+parameters:
+    level: 5
+    paths:
+        - src
+    excludePaths:
+        - src/templates/*
+        - src/migrations/*
+        - src/web/*
+        - src/translations/*
+    tmpDir: tests/_output/phpstan
+    treatPhpDocTypesAsCertain: false
+    bootstrapFiles:
+        - vendor/autoload.php
+        - vendor/craftcms/cms/bootstrap/console.php
+    ignoreErrors:
+        # Common patterns for Craft CMS plugins
+        - '#Cannot access offset .+ on mixed#'
+        - '#Cannot cast mixed to#'
+        - '#Call to an undefined static method craft\\base\\Element::tableAttributeHtml\(\).#'
+
+    # Rules for stricter code
+    checkFunctionNameCase: true
+    reportMagicMethods: true
+    reportMagicProperties: true
+    checkExplicitMixed: true
+    
+includes:
+    - vendor/craftcms/phpstan/phpstan.neon 

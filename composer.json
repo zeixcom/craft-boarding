@@ -1,0 +1,67 @@
+{
+    "name": "zeix/craft-boarding",
+    "description": "An onboarding plugin for the Control Panel.",
+    "type": "craft-plugin",
+    "version": "1.0.0",
+    "keywords": [
+        "craft",
+        "cms",
+        "craftcms",
+        "craft-plugin",
+        "boarding",
+        "onboarding",
+        "tours"
+    ],
+    "support": {
+        "docs": "https://github.com/zeix/craft-boarding/blob/master/README.md",
+        "issues": "https://github.com/zeix/craft-boarding/issues"
+    },
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Zeix AG",
+            "homepage": "https://zeix.com"
+        }
+    ],
+    "require": {
+        "craftcms/cms": "^5.0.0",
+        "php": "^8.0.2"
+    },
+    "require-dev": {
+        "codeception/codeception": "^5.0",
+        "codeception/module-yii2": "^1.1",
+        "codeception/module-asserts": "^3.0",
+        "craftcms/phpstan": "dev-main",
+        "phpstan/phpstan": "^1.10.0",
+        "vlucas/phpdotenv": "^5.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "zeix\\boarding\\": "src/"
+        }
+    },
+    "scripts": {
+        "phpstan": "phpstan analyse --memory-limit=256M",
+        "check": [
+            "@phpstan",
+            "@test"
+        ]
+    },
+    "extra": {
+        "name": "Boarding",
+        "handle": "boarding",
+        "developer": "Zeix",
+        "developerUrl": "https://zeix.com",
+        "documentationUrl": "https://github.com/zeix/craft-boarding/blob/master/README.md",
+        "changelogUrl": "https://raw.githubusercontent.com/zeix/craft-boarding/master/CHANGELOG.md",
+        "class": "zeix\\boarding\\Boarding",
+        "hasCpSettings": true,
+        "hasCpSection": true
+    },
+    "config": {
+        "allow-plugins": {
+            "yiisoft/yii2-composer": true,
+            "craftcms/plugin-installer": true
+        }
+    }
+}

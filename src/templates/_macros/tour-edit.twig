@@ -1,0 +1,124 @@
+{#
+ * Tour Edit Macros for Boarding Plugin
+ * 
+ * Reusable macros for handling multi-site tour editing functionality
+ #}
+
+{# Macro for getting site-specific or global field value #}
+{% macro getFieldValue(tour, fieldName, currentSite, primarySite, isTranslatable) %}
+    {%- if isTranslatable and tour and tour.translations and tour.translations[currentSite.id] is defined -%}
+        {{- tour.translations[currentSite.id][fieldName] ?? (tour[fieldName] ?? '') -}}
+    {%- else -%}
+        {{- tour ? (tour[fieldName] ?? '') : '' -}}
+    {%- endif -%}
+{% endmacro %}
+
+{# Macro for determining enabled status #}
+{% macro getTourEnabledStatus(tour, currentSite, primarySite, sites) %}
+    {%- set isTourEnabled = tour ? tour.enabled == 1 : true -%}
+    
+    {%- if sites|length > 1 -%}
+        {%- if tour and tour.translations is defined and tour.translations[currentSite.id] is defined -%}
+            {%- set translation = tour.translations[currentSite.id] -%}
+            {%- if translation.enabled is defined -%}
+                {%- set isTourEnabled = translation.enabled == 1 -%}
+            {%- else -%}
+                {%- set isTourEnabled = tour.enabled == 1 -%}
+            {%- endif -%}
+        {%- elseif tour and currentSite.id == primarySite.id -%}
+            {%- set isTourEnabled = tour.enabled == 1 -%}
+        {%- else -%}
+            {%- set isTourEnabled = tour ? (tour.enabled == 1) : true -%}
+        {%- endif -%}
+    {%- endif -%}
+    
+    {{- isTourEnabled ? '1' : '0' -}}
+{% endmacro %}
+
+{# Macro for step translation input fields #}
+{% macro stepTranslationField(fieldName, stepIndex, step, currentSite, sites, primarySite, required = true) %}
+    {%- if currentSite.id == primarySite.id -%}
+        {# Primary site: visible field + hidden translations #}
+        <input class="text fullwidth" type="text" name="steps[{{ stepIndex }}][{{ fieldName }}]" value="{{ step[fieldName] ?? '' }}" {{ required ? 'required' : '' }}>
+        
+        {%- for site in sites -%}
+            {%- if site.id != primarySite.id -%}
+                {%- set translationValue = '' -%}
+                {%- if step.translations is defined and step.translations[site.id] is defined -%}
+                    {%- set translationValue = step.translations[site.id][fieldName] ?? '' -%}
+                {%- else -%}
+                    {%- set translationValue = step[fieldName] ?? '' -%}
+                {%- endif -%}
+                <input type="hidden" name="steps[{{ stepIndex }}][translations][{{ site.id }}][{{ fieldName }}]" value="{{ translationValue }}">
+            {%- endif -%}
+        {%- endfor -%}
+    {%- else -%}
+        {# Non-primary site: visible translation field + hidden primary and other translations #}
+        {%- set currentSiteValue = '' -%}
+        {%- if step.translations is defined and step.translations[currentSite.id] is defined -%}
+            {%- set currentSiteValue = step.translations[currentSite.id][fieldName] ?? '' -%}
+        {%- else -%}
+            {%- set currentSiteValue = step[fieldName] ?? '' -%}
+        {%- endif -%}
+
+        <input class="text fullwidth" type="text" name="steps[{{ stepIndex }}][translations][{{ currentSite.id }}][{{ fieldName }}]" value="{{ currentSiteValue }}" {{ required ? 'required' : '' }}>
+        
+        {# Hidden primary site field #}
+        <input type="hidden" name="steps[{{ stepIndex }}][{{ fieldName }}]" value="{{ step[fieldName] ?? '' }}">
+        
+        {# Hidden other site translations #}
+        {%- for site in sites -%}
+            {%- if site.id != currentSite.id and site.id != primarySite.id -%}
+                {%- set otherSiteValue = '' -%}
+                {%- if step.translations is defined and step.translations[site.id] is defined -%}
+                    {%- set otherSiteValue = step.translations[site.id][fieldName] ?? '' -%}
+                {%- else -%}
+                    {%- set otherSiteValue = step[fieldName] ?? '' -%}
+                {%- endif -%}
+                <input type="hidden" name="steps[{{ stepIndex }}][translations][{{ site.id }}][{{ fieldName }}]" value="{{ otherSiteValue }}">
+            {%- endif -%}
+        {%- endfor -%}
+    {%- endif -%}
+{% endmacro %}
+
+{# Macro for step translation textarea fields #}
+{% macro stepTranslationTextarea(fieldName, stepIndex, step, currentSite, sites, primarySite, rows = 3) %}
+    {%- if currentSite.id == primarySite.id -%}
+        <textarea class="nicetext text fullwidth" name="steps[{{ stepIndex }}][{{ fieldName }}]" rows="{{ rows }}" required>{{ step[fieldName] ?? '' }}</textarea>
+        
+        {%- for site in sites -%}
+            {%- if site.id != primarySite.id -%}
+                {%- set translationValue = '' -%}
+                {%- if step.translations is defined and step.translations[site.id] is defined -%}
+                    {%- set translationValue = step.translations[site.id][fieldName] ?? '' -%}
+                {%- else -%}
+                    {%- set translationValue = step[fieldName] ?? '' -%}
+                {%- endif -%}
+                <input type="hidden" name="steps[{{ stepIndex }}][translations][{{ site.id }}][{{ fieldName }}]" value="{{ translationValue }}">
+            {%- endif -%}
+        {%- endfor -%}
+    {%- else -%}
+        {%- set currentSiteValue = '' -%}
+        {%- if step.translations is defined and step.translations[currentSite.id] is defined -%}
+            {%- set currentSiteValue = step.translations[currentSite.id][fieldName] ?? '' -%}
+        {%- else -%}
+            {%- set currentSiteValue = step[fieldName] ?? '' -%}
+        {%- endif -%}
+        
+        <textarea class="nicetext text fullwidth" name="steps[{{ stepIndex }}][translations][{{ currentSite.id }}][{{ fieldName }}]" rows="{{ rows }}" required>{{ currentSiteValue }}</textarea>
+        
+        <input type="hidden" name="steps[{{ stepIndex }}][{{ fieldName }}]" value="{{ step[fieldName] ?? '' }}">
+        
+        {%- for site in sites -%}
+            {%- if site.id != currentSite.id and site.id != primarySite.id -%}
+                {%- set otherSiteValue = '' -%}
+                {%- if step.translations is defined and step.translations[site.id] is defined -%}
+                    {%- set otherSiteValue = step.translations[site.id][fieldName] ?? '' -%}
+                {%- else -%}
+                    {%- set otherSiteValue = step[fieldName] ?? '' -%}
+                {%- endif -%}
+                <input type="hidden" name="steps[{{ stepIndex }}][translations][{{ site.id }}][{{ fieldName }}]" value="{{ otherSiteValue }}">
+            {%- endif -%}
+        {%- endfor -%}
+    {%- endif -%}
+{% endmacro %}

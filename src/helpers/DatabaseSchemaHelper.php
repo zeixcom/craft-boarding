@@ -1,0 +1,89 @@
+<?php
+
+namespace zeix\boarding\helpers;
+
+use Craft;
+use zeix\boarding\utils\Logger;
+
+/**
+ * DatabaseSchemaHelper - Centralized database schema checking
+ * 
+ * This class provides consistent methods for checking column existence and
+ * caching results to avoid repeated database queries.
+ */
+class DatabaseSchemaHelper
+{
+    /**
+     * @var array Cache for column existence checks
+     */
+    private static array $columnCache = [];
+
+    /**
+     * Check if the translatable column exists in the tours table
+     * 
+     * @return bool
+     */
+    public static function hasTranslatableColumn(): bool
+    {
+        return self::columnExists('{{%boarding_tours}}', 'translatable');
+    }
+
+    /**
+     * Check if the progressPosition column exists in the tours table
+     * 
+     * @return bool
+     */
+    public static function hasProgressPositionColumn(): bool
+    {
+        return self::columnExists('{{%boarding_tours}}', 'progressPosition');
+    }
+
+    /**
+     * Get all available column information for tours table
+     * 
+     * @return array Column existence information
+     */
+    public static function getAvailableColumns(): array
+    {
+        return [
+            'hasTranslatable' => self::hasTranslatableColumn(),
+            'hasProgressPosition' => self::hasProgressPositionColumn(),
+        ];
+    }
+
+    /**
+     * Check if a column exists in a table with caching
+     * 
+     * @param string $table Table name
+     * @param string $column Column name
+     * @return bool
+     */
+    public static function columnExists(string $table, string $column): bool
+    {
+        $cacheKey = $table . '.' . $column;
+
+        if (isset(self::$columnCache[$cacheKey])) {
+            return self::$columnCache[$cacheKey];
+        }
+
+        try {
+            $exists = Craft::$app->getDb()->columnExists($table, $column);
+            self::$columnCache[$cacheKey] = $exists;
+            return $exists;
+        } catch (\Exception $e) {
+            Logger::error('Error checking column existence: ' . $e->getMessage(), 'boarding');
+            self::$columnCache[$cacheKey] = false;
+            return false;
+        }
+    }
+
+    /**
+     * Clear the column cache (useful for migrations or testing)
+     * 
+     * @return void
+     */
+    public static function clearCache(): void
+    {
+        self::$columnCache = [];
+    }
+}

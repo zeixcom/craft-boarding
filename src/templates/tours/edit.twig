@@ -1,0 +1,277 @@
+{% extends "_layouts/cp" %}
+{% import "_includes/forms" as forms %}
+{% import "boarding/_macros/tour-edit.twig" as tourMacros %}
+
+{% set tour = tour is defined ? tour : null %}
+{% set title = tour ? "Edit Tour: #{tour.name}"|t('boarding') : "Create New Tour"|t('boarding') %}
+{% set currentSite = craft.app.sites.currentSite %}
+{% set sites = craft.app.sites.getAllSites() %}
+{% set primarySite = craft.app.sites.primarySite %}
+{% set isTranslatable = tour ? tour.translatable : false %}
+
+{% do view.registerAssetBundle("zeix\\boarding\\assetbundles\\BoardingAsset").forTourEditor() %}
+
+{% requirePermission 'accessPlugin-boarding' %}
+{% if tour %}
+	{% requirePermission 'boarding:edittours' %}
+{% else %}
+	{% requirePermission 'boarding:createtours' %}
+{% endif %}
+
+{# In your tour editing template #}
+{% block actionButton %}
+	{% if craft.app.isMultiSite and tour and tour.translatable %}
+
+        <div class="site-selector">
+            <div class="btn menubtn" data-icon="world">{{ currentSite.name|t('site') }}</div>
+            <div class="menu">
+                <ul class="padded">
+                    {% for siteItem in craft.app.sites.getAllSites() %}
+                        <li>
+                            <a href="{{ url('boarding/tours/edit/' ~ (tour.id ?? 'new'), {site: siteItem.handle}) }}" {% if siteItem.id == currentSite.id %}class="sel"{% endif %}>
+                                {{ siteItem.name|t('site') }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+
+{% block content %}	
+	<div id="boarding-tour-edit" class="boarding-plugin" 
+		data-is-new="{{ tour ? 'false' : 'true' }}"
+		data-primary-site-id="{{ primarySite.id }}">
+		<form method="post" accept-charset="UTF-8" data-saveshortcut data-validate id="tour-edit-form">
+			{{ csrfInput() }}
+			{{ actionInput('boarding/tours/save') }}
+			{{ redirectInput('boarding/tours') }}
+			
+			{% if tour and tour.id %}
+				{{ hiddenInput('id', tour.id) }}
+			{% endif %}
+            
+            {{ hiddenInput('siteId', currentSite.id) }}
+
+			<div class="field-layout">
+				<div class="field-layout-column">
+					{# Enabled field - simplified with macro #}
+					{% if sites|length > 1 %}
+						{{ forms.lightswitchField({
+							label: "Enabled for " ~ currentSite.name|t('app'),
+							id: 'enabled',
+							name: 'siteEnabled[' ~ currentSite.id ~ ']',
+							on: tourMacros.getTourEnabledStatus(tour, currentSite, primarySite, sites) == '1',
+							first: true
+						}) }}
+					{% else %}
+						{{ forms.lightswitchField({
+							label: "Enabled"|t('app'),
+							id: 'enabled',
+							name: 'enabled',
+							on: tour ? (tour.enabled == 1) : true,
+							first: true
+						}) }}
+					{% endif %}
+
+					{% if sites|length > 1 and isProEdition %}
+						{{ forms.lightswitchField({
+							label: "Translatable Tour"|t('boarding'),
+							instructions: "Whether this tour should be translatable across sites"|t('boarding'),
+							id: 'translatable',
+							name: 'translatable',
+							on: tour ? tour.translatable == 1 : false,
+						}) }}
+					{% endif %}
+
+					{# Name field - simplified with macro #}
+					{{ forms.textField({
+						label: "Name"|t('boarding') ~ (isTranslatable ? " (" ~ currentSite.name ~ ")" : ""),
+						id: 'name',
+						name: 'name',
+						value: tourMacros.getFieldValue(tour, 'name', currentSite, primarySite, isTranslatable),
+						required: true,
+						errors: tour.getErrors('name') ?? null,
+						class: 'fullwidth'
+					}) }}
+
+					{# Description field - simplified with macro #}
+					{{ forms.textareaField({
+						label: "Description"|t('boarding') ~ (isTranslatable ? " (" ~ currentSite.name ~ ")" : ""),
+						id: 'description',
+						name: 'description',
+						value: tourMacros.getFieldValue(tour, 'description', currentSite, primarySite, isTranslatable),
+						class: 'nicetext fullwidth',
+						rows: 3
+					}) }}
+
+					<hr>
+
+					{{ forms.selectField({
+						label: "Progress Indicator Position"|t('boarding'),
+						instructions: "Where to display the progress indicator (step count)"|t('boarding'),
+						id: 'progressPosition',
+						name: 'progressPosition',
+						options: {
+							'off': 'Off '|t('boarding'),
+							'header': 'Step Header'|t('boarding'),
+							'footer': 'Step Footer'|t('boarding')
+						},
+						value: tour ? tour.progressPosition : 'off'
+					}) }}
+
+					<hr>
+										
+					{{ forms.checkboxGroupField({
+						label: "User Groups"|t('boarding'),
+						instructions: "Select which user groups can access this tour"|t('boarding'),
+						id: "userGroupIds",
+						name: "userGroupIds",
+						options: craft.app.userGroups.getAllGroups()|map(g => {
+							label: g.name,
+							value: g.id|string
+						}),
+						values: tour ? tour.userGroups|map(v => v|string) : [],
+					}) }}
+
+					<div class="field">
+						<div class="heading">
+							<label class="required">{{ "Steps"|t('boarding') }}</label>
+						</div>
+
+						<div id="tour-steps" class="grid">
+							{% if tour and tour.steps %}
+								{% for step in tour.steps %}
+									<div class="tour-step card">
+										<div class="card-header">
+											<h4>Step {{ loop.index }}</h4>
+											<div class="card-actions">
+												<div class="move icon" title="{{ 'Reorder'|t('app') }}"></div>
+												<button type="button" class="btn small icon js-add-step-above" title="{{ 'Add step above'|t('boarding') }}">
+													<span data-icon="minus"></span>
+												</button>
+												<button type="button" class="btn small icon js-add-step-below" title="{{ 'Add step below'|t('boarding') }}">
+													<span data-icon="plus"></span>
+												</button>
+												<button type="button" class="btn small icon delete js-delete-step" title="{{ 'Delete step'|t('boarding') }}"></button>
+											</div>
+										</div>
+										<div class="card-body">
+											{% set stepIndex = loop.index0 %}
+											
+											{# Step title field - simplified with macro #}
+											<div class="field">
+												<div class="heading">
+													<label class="required">{{ "Title"|t('boarding') }}</label>
+												</div>
+												<div class="input">
+													{{ tourMacros.stepTranslationField('title', stepIndex, step, currentSite, sites, primarySite) }}
+												</div>
+											</div>
+
+											{# Step content field - simplified with macro #}
+											<div class="field">
+												<div class="heading">
+													<label class="required">{{ "Content"|t('boarding') }}</label>
+													<div class="instructions">{{ "The content that will be shown to users in this step"|t('boarding') }}</div>
+												</div>
+												<div class="input">
+													{{ tourMacros.stepTranslationTextarea('text', stepIndex, step, currentSite, sites, primarySite, 3) }}
+												</div>
+											</div>
+
+											<div class="field">
+												<div class="heading">
+													<label>{{ "Step Type"|t('boarding') }}</label>
+													<div class="instructions">{{ "Choose whether this is a regular step or a navigation step"|t('boarding') }}</div>
+												</div>
+												
+												<div class="input">
+													<div class="select">
+														<select class="select" name="steps[{{ stepIndex }}][type]">
+															<option value="default" {{ (step.type ?? 'default') == 'default' ? 'selected' : '' }}>{{ "Default Step"|t('boarding') }}</option>
+															<option value="navigation" {{ (step.type ?? 'default') == 'navigation' ? 'selected' : '' }}>{{ "Navigation Step"|t('boarding') }}</option>
+														</select>
+													</div>
+												</div>
+											</div>
+
+											<div class="navigation-fields {% if (step.type ?? 'default') == 'navigation' %}visible{% else %}hidden{% endif %}">
+												<div class="field">
+													<div class="heading">
+														<label>{{ "Navigation URL"|t('boarding') }}</label>
+														<div class="instructions">{{ "The URL to navigate to (e.g., /admin/assets)"|t('boarding') }}</div>
+													</div>
+													<div class="input">
+														<input class="text fullwidth" type="text" name="steps[{{ stepIndex }}][navigationUrl]" value="{{ step.navigationUrl ?? '' }}">
+													</div>
+												</div>
+												<div class="field">
+													<div class="heading">
+														<label>{{ "Navigation Button Text"|t('boarding') }}</label>
+														<div class="instructions">{{ "The text to display on the navigation button"|t('boarding') }}</div>
+													</div>
+													<div class="input">
+														{{ tourMacros.stepTranslationField('navigationButtonText', stepIndex, step, currentSite, sites, primarySite, false) }}
+													</div>
+												</div>
+											</div>
+
+											<div class="field">
+												<div class="heading">
+													<label>{{ "Target Element"|t('boarding') }}</label>
+													<div class="instructions">{{ "CSS selector for the target element (e.g. #nav-dashboard)"|t('boarding') }}</div>
+												</div>
+												<div class="input">
+													<input class="text fullwidth" type="text" name="steps[{{ stepIndex }}][attachTo][element]" value="{{ (step.attachTo ?? {}).element ?? '' }}">
+												</div>
+											</div>
+
+											<div class="field">
+												<div class="heading">
+													<label>{{ "Placement"|t('boarding') }}</label>
+													<div class="instructions">{{ "Where the step should appear relative to the target element"|t('boarding') }}</div>
+												</div>
+												<div class="input ltr">
+													<div class="select">
+														<select class="select" name="steps[{{ stepIndex }}][attachTo][on]">
+															<option value="top" {{ ((step.attachTo ?? {}).on ?? 'bottom') == 'top' ? 'selected' : '' }}>{{ "Top"|t('boarding') }}</option>
+															<option value="bottom" {{ ((step.attachTo ?? {}).on ?? 'bottom') == 'bottom' ? 'selected' : '' }}>{{ "Bottom"|t('boarding') }}</option>
+															<option value="left" {{ ((step.attachTo ?? {}).on ?? 'bottom') == 'left' ? 'selected' : '' }}>{{ "Left"|t('boarding') }}</option>
+															<option value="right" {{ ((step.attachTo ?? {}).on ?? 'bottom') == 'right' ? 'selected' : '' }}>{{ "Right"|t('boarding') }}</option>
+														</select>
+													</div>
+												</div>
+											</div>
+
+										</div>
+									</div>
+								{% endfor %}
+							{% endif %}
+						</div>
+
+						<div class="buttons">
+							<button type="button" class="btn add icon js-add-step">
+								{{ "Add Step"|t('boarding') }}
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="tour-validation-error alert error" style="display: none;">
+				{{ "A tour must have at least one step defined."|t('boarding') }}
+			</div>
+
+			<div class="buttons">
+				<button type="submit" class="btn submit">{{ "Save"|t('boarding') }}</button>
+
+				{% if tour and tour.tourId %}
+					<a href="{{ url('admin/dashboard', { startTour: tour.tourId }) }}" class="btn" target="_blank">{{ "Preview"|t('boarding') }}</a>
+				{% endif %}
+			</div>
+		</form>
+	</div>
+{% endblock %}
