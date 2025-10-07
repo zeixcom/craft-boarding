@@ -13,8 +13,8 @@
         "tours"
     ],
     "support": {
-        "docs": "https://github.com/zeix/craft-boarding/blob/master/README.md",
-        "issues": "https://github.com/zeix/craft-boarding/issues"
+        "docs": "https://github.com/zeixcom/craft-boarding/blob/main/README.md",
+        "issues": "https://github.com/zeixcom/craft-boarding/issues"
     },
     "license": "proprietary",
     "authors": [
@@ -52,8 +52,8 @@
         "handle": "boarding",
         "developer": "Zeix",
         "developerUrl": "https://zeix.com",
-        "documentationUrl": "https://github.com/zeix/craft-boarding/blob/master/README.md",
-        "changelogUrl": "https://raw.githubusercontent.com/zeix/craft-boarding/master/CHANGELOG.md",
+        "documentationUrl": "https://github.com/zeixcom/craft-boarding/blob/main/README.md",
+        "changelogUrl": "https://github.com/zeixcom/craft-boarding/blob/main/CHANGELOG.md",
         "class": "zeix\\boarding\\Boarding",
         "hasCpSettings": true,
         "hasCpSection": true

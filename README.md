@@ -19,7 +19,7 @@ Boarding is available in two editions: **Lite** (free) and **Pro** (paid).
 - Behavior settings (Auto-start or manual tour initiation)
 - Single site installations
 
-### Pro Edition
+### Standard Edition
 All Lite features, plus:
 - **Unlimited tours** - Create as many tours as you need
 - **Multi-Site Support** - Configure different settings for each site
@@ -68,7 +68,7 @@ composer require zeix/craft-boarding
 
 ### Multi-Language Tours and Translations
 
-The Boarding Pro edition provides comprehensive support for multi-site and multi-language tours, allowing you to create localized experiences for users across different sites.
+The Boarding Standard edition provides comprehensive support for multi-site and multi-language tours, allowing you to create localized experiences for users across different sites.
 
 #### Creating Multi-Language Tours
 
@@ -137,7 +137,7 @@ To create a copy of an existing tour:
 
 ### Importing and Exporting Tours
 
-Boarding Pro includes powerful import/export functionality to help you migrate tours between projects, create backups, or share tour templates.
+Boarding Standard includes powerful import/export functionality to help you migrate tours between projects, create backups, or share tour templates.
 
 #### Exporting Tours
 
@@ -211,7 +211,7 @@ The plugin includes the following permissions:
    - Allows access to the plugin settings page
    - Requires "Access Boarding Plugin" permission
    - Enables configuration of button positions, default behavior, and button text
-   - In Pro edition, allows configuration of site-specific settings
+   - In Standard Edition, allows configuration of site-specific settings
 
 **Important**: User group assignment is about tour visibility, while permissions control what users can do with tours (create, edit, delete).
 

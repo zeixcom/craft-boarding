@@ -15,7 +15,6 @@ use zeix\boarding\services\ToursService;
 use zeix\boarding\services\ImportService;
 use zeix\boarding\services\ExportService;
 use zeix\boarding\assetbundles\BoardingAsset;
-use zeix\boarding\variables\BoardingVariable;
 use zeix\boarding\models\Settings;
 use craft\events\RegisterTemplateRootsEvent;
 use craft\events\RegisterUserPermissionsEvent;
@@ -23,7 +22,6 @@ use craft\services\UserPermissions;
 use craft\web\View;
 use craft\web\UrlManager;
 use craft\events\RegisterUrlRulesEvent;
-use craft\web\twig\variables\CraftVariable;
 use zeix\boarding\helpers\SiteHelper;
 use yii\base\Event;
 use craft\base\Plugin;
@@ -49,7 +47,7 @@ class Boarding extends Plugin
     /**
      * @var string
      */
-    public const EDITION_PRO = 'pro';
+    public const EDITION_STANDARD = 'standard';
 
     /**
      * @var int Maximum number of tours allowed in Lite edition
@@ -78,7 +76,7 @@ class Boarding extends Plugin
     {
         return [
             self::EDITION_LITE,
-            self::EDITION_PRO,
+            self::EDITION_STANDARD,
         ];
     }
 
@@ -147,16 +145,6 @@ class Boarding extends Plugin
                 ];
 
                 $event->rules = array_merge($event->rules, $rules);
-            }
-        );
-
-        Event::on(
-            CraftVariable::class,
-            CraftVariable::EVENT_INIT,
-            function (Event $event) {
-                /** @var CraftVariable $variable */
-                $variable = $event->sender;
-                $variable->set('boarding', BoardingVariable::class);
             }
         );
 

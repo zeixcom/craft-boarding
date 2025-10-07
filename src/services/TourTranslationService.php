@@ -42,16 +42,6 @@ class TourTranslationService extends Component
     }
 
     /**
-     * Set query service (for testing/dependency injection).
-     *
-     * @param TourQueryService $service
-     */
-    public function setQueryService(TourQueryService $service): void
-    {
-        $this->queryService = $service;
-    }
-
-    /**
      * Apply translations to a tour for a specific site.
      * 
      * @param array $tour The tour data

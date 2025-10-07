@@ -19,14 +19,14 @@ class SettingsController extends Controller
 
         $plugin = Boarding::getInstance();
         $allSites = Craft::$app->getSites()->getAllSites();
-        $isProEdition = $plugin->is(Boarding::EDITION_PRO);
+        $isStandardEdition = $plugin->is(Boarding::EDITION_STANDARD);
         $isMultiSite = count($allSites) > 1;
         
         /** @var \zeix\boarding\models\Settings $settings */
         $settings = $plugin->getSettings();
 
         // For multi-site installations without Pro, use primary site settings
-        $requireSiteParam = $isMultiSite && $isProEdition;
+        $requireSiteParam = $isMultiSite && $isStandardEdition;
         $currentSite = $requireSiteParam ? SiteHelper::getSiteForRequest($this->request, true) : Craft::$app->getSites()->getPrimarySite();
 
         $siteSettings = $settings->getSettingsForSite($currentSite->id);
@@ -38,7 +38,7 @@ class SettingsController extends Controller
             'allSites' => $allSites,
             'siteSettings' => $siteSettings,
             'siteButtonTexts' => $siteButtonTexts,
-            'isProEdition' => $isProEdition,
+            'isStandardEdition' => $isStandardEdition,
             'isMultiSite' => $isMultiSite
         ]);
     }
@@ -55,19 +55,17 @@ class SettingsController extends Controller
         /** @var \zeix\boarding\models\Settings $settings */
         $settings = $plugin->getSettings();
         $allSites = Craft::$app->getSites()->getAllSites();
-        $isProEdition = $plugin->is(Boarding::EDITION_PRO);
+        $isStandardEdition = $plugin->is(Boarding::EDITION_STANDARD);
         $isMultiSite = count($allSites) > 1;
 
-        // For multi-site installations without Pro, use primary site settings
-        $requireSiteParam = $isMultiSite && $isProEdition;
+        $requireSiteParam = $isMultiSite && $isStandardEdition;
         $currentSite = $requireSiteParam ? SiteHelper::getSiteForRequest($this->request, true) : Craft::$app->getSites()->getPrimarySite();
 
         $postedSettings = $this->request->getBodyParam('settings', []);
         $siteButtonTexts = $this->request->getBodyParam('siteButtonTexts', []);
         $siteGeneralSettings = $this->request->getBodyParam('siteSettings', []);
 
-        // Only allow site-specific settings for Pro edition
-        if ($isMultiSite && $isProEdition) {
+        if ($isMultiSite && $isStandardEdition) {
             if (!empty($siteButtonTexts)) {
                 $settings->setButtonTextsForSite($currentSite->id, $siteButtonTexts);
                 $postedSettings['siteButtonTexts'] = $settings->siteButtonTexts;

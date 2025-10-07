@@ -76,7 +76,7 @@
 						}) }}
 					{% endif %}
 
-					{% if sites|length > 1 and isProEdition %}
+					{% if sites|length > 1 and isStandardEdition %}
 						{{ forms.lightswitchField({
 							label: "Translatable Tour"|t('boarding'),
 							instructions: "Whether this tour should be translatable across sites"|t('boarding'),
@@ -86,7 +86,6 @@
 						}) }}
 					{% endif %}
 
-					{# Name field - simplified with macro #}
 					{{ forms.textField({
 						label: "Name"|t('boarding') ~ (isTranslatable ? " (" ~ currentSite.name ~ ")" : ""),
 						id: 'name',
@@ -97,7 +96,6 @@
 						class: 'fullwidth'
 					}) }}
 
-					{# Description field - simplified with macro #}
 					{{ forms.textareaField({
 						label: "Description"|t('boarding') ~ (isTranslatable ? " (" ~ currentSite.name ~ ")" : ""),
 						id: 'description',
@@ -161,7 +159,6 @@
 										<div class="card-body">
 											{% set stepIndex = loop.index0 %}
 											
-											{# Step title field - simplified with macro #}
 											<div class="field">
 												<div class="heading">
 													<label class="required">{{ "Title"|t('boarding') }}</label>
@@ -171,7 +168,6 @@
 												</div>
 											</div>
 
-											{# Step content field - simplified with macro #}
 											<div class="field">
 												<div class="heading">
 													<label class="required">{{ "Content"|t('boarding') }}</label>

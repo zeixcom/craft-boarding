@@ -164,11 +164,11 @@ class ToursController extends Controller
         } else {
             $this->requirePermission('boarding:createtours');
 
-            if (!Boarding::getInstance()->is(Boarding::EDITION_PRO)) {
+            if (!Boarding::getInstance()->is(Boarding::EDITION_STANDARD)) {
                 $existingTourCount = count(Boarding::getInstance()->tours->getAllTours());
                 if ($existingTourCount >= Boarding::LITE_TOUR_LIMIT) {
                     Craft::$app->getSession()->setError(
-                        Craft::t('boarding', 'You have reached the maximum of {limit} tours allowed in Boarding Lite. Upgrade to Boarding Pro for unlimited tours.', [
+                        Craft::t('boarding', 'You have reached the maximum of {limit} tours allowed in Boarding Lite. Upgrade to Boarding Standard for unlimited tours.', [
                             'limit' => Boarding::LITE_TOUR_LIMIT
                         ])
                     );
@@ -181,8 +181,8 @@ class ToursController extends Controller
         $isMultiSite = count(Craft::$app->getSites()->getAllSites()) > 1;
 
         $translatable = $this->request->getBodyParam('translatable', false);
-        if ($isMultiSite && $translatable && !Boarding::getInstance()->is(Boarding::EDITION_PRO)) {
-            throw new \yii\web\ForbiddenHttpException(Craft::t('boarding', 'Multi-site translation features require Boarding Pro.'));
+        if ($isMultiSite && $translatable && !Boarding::getInstance()->is(Boarding::EDITION_STANDARD)) {
+            throw new \yii\web\ForbiddenHttpException(Craft::t('boarding', 'Multi-site translation features require Boarding Standard Edition.'));
         }
 
         $name = Html::encode($this->request->getBodyParam('name'));
