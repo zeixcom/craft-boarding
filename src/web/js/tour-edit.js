@@ -105,19 +105,19 @@
             const $steps = this.$container.find('#tour-steps');
             const $cards = $steps.find('.card');
             const totalSteps = $cards.length;
-            
+
             const $newStep = $(this.getStepTemplate(index));
-            
-            if (index === 0) {
+
+            if (index <= 0) {
                 $steps.prepend($newStep);
             } else if (index >= totalSteps) {
                 $steps.append($newStep);
             } else {
-                $cards.eq(index).before($newStep);
+                $cards.eq(index - 1).after($newStep);
             }
-            
+
             this.updateStepOrder();
-            
+
             this.refreshSortable();
         },
 

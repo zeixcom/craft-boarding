@@ -140,9 +140,9 @@
 						</div>
 
 						<div id="tour-steps" class="grid">
-							{% if tour and tour.steps %}
-								{% for step in tour.steps %}
-									<div class="tour-step card">
+							{% set steps = tour and tour.steps ? tour.steps : [{}] %}
+							{% for step in steps %}
+								<div class="tour-step card">
 										<div class="card-header">
 											<h4>Step {{ loop.index }}</h4>
 											<div class="card-actions">
@@ -245,7 +245,6 @@
 										</div>
 									</div>
 								{% endfor %}
-							{% endif %}
 						</div>
 
 						<div class="buttons">
