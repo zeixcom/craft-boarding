@@ -25,7 +25,6 @@ class SettingsController extends Controller
         /** @var \zeix\boarding\models\Settings $settings */
         $settings = $plugin->getSettings();
 
-        // For multi-site installations without Pro, use primary site settings
         $requireSiteParam = $isMultiSite && $isStandardEdition;
         $currentSite = $requireSiteParam ? SiteHelper::getSiteForRequest($this->request, true) : Craft::$app->getSites()->getPrimarySite();
 
