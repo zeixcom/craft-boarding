@@ -54,9 +54,7 @@
         "developerUrl": "https://zeix.com",
         "documentationUrl": "https://github.com/zeixcom/craft-boarding/blob/main/README.md",
         "changelogUrl": "https://github.com/zeixcom/craft-boarding/blob/main/CHANGELOG.md",
-        "class": "zeix\\boarding\\Boarding",
-        "hasCpSettings": true,
-        "hasCpSection": true
+        "class": "zeix\\boarding\\Boarding"
     },
     "config": {
         "allow-plugins": {

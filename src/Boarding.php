@@ -26,6 +26,7 @@ use zeix\boarding\helpers\SiteHelper;
 use yii\base\Event;
 use craft\base\Plugin;
 use Craft;
+use craft\base\Model;
 
 /**
  * Boarding plugin for Craft CMS
@@ -70,6 +71,11 @@ class Boarding extends Plugin
     public bool $hasCpSection = true;
 
     /**
+     * @var bool
+     */
+    public bool $hasCpSettings = false;
+
+    /**
      * @inheritdoc
      */
     public static function editions(): array
@@ -79,6 +85,18 @@ class Boarding extends Plugin
             self::EDITION_STANDARD,
         ];
     }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function settingsHtml(): ?string
+    {
+        return Craft::$app->getView()->renderTemplate('boarding/settings', [
+            'settings' => $this->getSettings(),
+        ]);
+    }
+
 
     /**
      * Initialize plugin
@@ -152,48 +170,55 @@ class Boarding extends Plugin
         $settings = $this->getSettings();
         $allSites = Craft::$app->getSites()->getAllSites();
 
-        $requireSiteParam = count($allSites) > 1;
-        try {
-            $currentSite = SiteHelper::getSiteForRequest(Craft::$app->request, $requireSiteParam);
-        } catch (\Exception $e) {
-            if (Craft::$app->getConfig()->getGeneral()->devMode) {
-                Craft::warning('Boarding plugin: Site resolution failed - ' . $e->getMessage(), 'boarding');
+        if (Craft::$app->request instanceof \craft\console\Request) {
+            $currentSite = Craft::$app->getSites()->getPrimarySite();
+        } else {
+            $requireSiteParam = count($allSites) > 1;
+            try {
+                $currentSite = SiteHelper::getSiteForRequest(Craft::$app->request, $requireSiteParam);
+            } catch (\Exception $e) {
+                if (Craft::$app->getConfig()->getGeneral()->devMode) {
+                    Craft::warning('Boarding plugin: Site resolution failed - ' . $e->getMessage(), 'boarding');
+                }
+
+                $currentSite = Craft::$app->getSites()->getCurrentSite();
+            }
+        }
+
+        // Only register assets and JS settings for web requests
+        if (!Craft::$app->request instanceof \craft\console\Request) {
+            if (count($allSites) > 1) {
+                $siteSettings = $settings->getAllSettingsForSite($currentSite->id);
+            } else {
+                $siteSettings = [
+                    'defaultBehavior' => $settings->defaultBehavior,
+                    'buttonPosition' => $settings->buttonPosition,
+                    'buttonLabel' => $settings->buttonLabel,
+                    'nextButtonText' => $settings->nextButtonText,
+                    'doneButtonText' => $settings->doneButtonText,
+                    'backButtonText' => $settings->backButtonText,
+                ];
             }
 
-            $currentSite = Craft::$app->getSites()->getCurrentSite();
-        }
+            $view = Craft::$app->getView();
+            $view->registerAssetBundle(BoardingAsset::class);
 
-        if (count($allSites) > 1) {
-            $siteSettings = $settings->getAllSettingsForSite($currentSite->id);
-        } else {
-            $siteSettings = [
-                'defaultBehavior' => $settings->defaultBehavior,
-                'buttonPosition' => $settings->buttonPosition,
-                'buttonLabel' => $settings->buttonLabel,
-                'nextButtonText' => $settings->nextButtonText,
-                'doneButtonText' => $settings->doneButtonText,
-                'backButtonText' => $settings->backButtonText,
+            $jsSettings = [
+                'buttonPosition' => $siteSettings['buttonPosition'],
+                'defaultBehavior' => $siteSettings['defaultBehavior'],
+                'buttonLabel' => $siteSettings['buttonLabel'],
+                'nextButtonText' => $siteSettings['nextButtonText'],
+                'doneButtonText' => $siteSettings['doneButtonText'],
+                'backButtonText' => $siteSettings['backButtonText'],
+                'currentSiteId' => $currentSite->id,
+                'currentSiteHandle' => $currentSite->handle,
+                'isMultiSite' => count($allSites) > 1,
             ];
-        }
 
-        $view = Craft::$app->getView();
-        $view->registerAssetBundle(BoardingAsset::class);
-
-        $jsSettings = [
-            'buttonPosition' => $siteSettings['buttonPosition'],
-            'defaultBehavior' => $siteSettings['defaultBehavior'],
-            'buttonLabel' => $siteSettings['buttonLabel'],
-            'nextButtonText' => $siteSettings['nextButtonText'],
-            'doneButtonText' => $siteSettings['doneButtonText'],
-            'backButtonText' => $siteSettings['backButtonText'],
-            'currentSiteId' => $currentSite->id,
-            'currentSiteHandle' => $currentSite->handle,
-            'isMultiSite' => count($allSites) > 1,
-        ];
-
-        $view->registerJs('
+            $view->registerJs('
                 window.boardingSettings = ' . json_encode($jsSettings) . ';
                 ', View::POS_BEGIN);
+        }
     }
 
     /**
@@ -240,9 +265,17 @@ class Boarding extends Plugin
     /**
      * @inheritdoc
      */
-    protected function createSettingsModel(): ?\craft\base\Model
+    protected function createSettingsModel(): ?Model
     {
         return new Settings();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSettingsResponse(): mixed
+    {
+        return Craft::$app->getResponse()->redirect('boarding/settings');
     }
 
     public static function getInstance(): self
