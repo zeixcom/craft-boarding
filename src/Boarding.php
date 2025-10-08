@@ -185,8 +185,8 @@ class Boarding extends Plugin
             }
         }
 
-        // Only register assets and JS settings for web requests
-        if (!Craft::$app->request instanceof \craft\console\Request) {
+        // Only register assets and JS settings for CP requests
+        if (Craft::$app->request->getIsCpRequest()) {
             if (count($allSites) > 1) {
                 $siteSettings = $settings->getAllSettingsForSite($currentSite->id);
             } else {
