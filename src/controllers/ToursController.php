@@ -34,7 +34,7 @@ class ToursController extends Controller
     {
         $this->requirePermission('accessPlugin-boarding');
 
-        $site = SiteHelper::getSiteForRequest($this->request, true);
+        $site = SiteHelper::getSiteForRequestAuto($this->request);
         $tourIndexData = Boarding::getInstance()->tours->getToursForIndex($site);
 
         return $this->renderTemplate('boarding/tours/index', $tourIndexData);
@@ -51,7 +51,7 @@ class ToursController extends Controller
             $this->requirePermission('boarding:createtours');
         }
 
-        $site = SiteHelper::getSiteForRequest($this->request, true);
+        $site = SiteHelper::getSiteForRequestAuto($this->request);
         $tourEditData = Boarding::getInstance()->tours->getTourForEdit($id ? (int)$id : null, $site);
 
         return $this->renderTemplate('boarding/tours/edit', $tourEditData);
@@ -177,8 +177,9 @@ class ToursController extends Controller
             }
         }
 
-        $currentSite = SiteHelper::getSiteForRequest($this->request, true);
-        $isMultiSite = count(Craft::$app->getSites()->getAllSites()) > 1;
+        $allSites = Craft::$app->getSites()->getAllSites();
+        $isMultiSite = count($allSites) > 1;
+        $currentSite = SiteHelper::getSiteForRequestAuto($this->request);
 
         $translatable = $this->request->getBodyParam('translatable', false);
         if ($isMultiSite && $translatable && !Boarding::getInstance()->is(Boarding::EDITION_STANDARD)) {

@@ -51,7 +51,7 @@ class TourTranslationService extends Component
     public function applyTourTranslations(array $tour, ?int $siteId = null): array
     {
         if ($siteId === null) {
-            $currentSite = SiteHelper::getSiteForRequest($this->request, true);
+            $currentSite = SiteHelper::getSiteForRequestAuto($this->request);
             $siteId = $currentSite->id;
         }
 
@@ -61,7 +61,7 @@ class TourTranslationService extends Component
 
     /**
      * Process steps data from the request, handling translations.
-     * 
+     *
      * @param array $steps The raw steps data
      * @return array Processed steps data
      */
@@ -70,7 +70,7 @@ class TourTranslationService extends Component
         try {
             $processedSteps = TranslationProcessor::processStepTranslations($steps);
 
-            $currentSite = SiteHelper::getSiteForRequest($this->request, true);
+            $currentSite = SiteHelper::getSiteForRequestAuto($this->request);
             $primarySite = Craft::$app->getSites()->getPrimarySite();
             $isEditingInPrimarySite = $currentSite->id == $primarySite->id;
 

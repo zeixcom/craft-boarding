@@ -15,9 +15,8 @@ class ExportService extends \craft\base\Component
      */
     public function exportTours(array $tours): array
     {
-        $currentSite = SiteHelper::getSiteForRequest(Craft::$app->getRequest(), true);
+        $currentSite = SiteHelper::getSiteForRequestAuto(Craft::$app->getRequest());
 
-        // Clean up tour data for export (remove IDs, timestamps, etc.)
         $cleanedTours = [];
         foreach ($tours as $tour) {
             $cleanedTour = [

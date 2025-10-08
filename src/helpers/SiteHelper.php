@@ -9,8 +9,27 @@ use yii\web\NotFoundHttpException;
 class SiteHelper
 {
     /**
+     * Get the site for the current request, automatically handling single vs multi-site
+     *
+     * @param Request $request The request object
+     * @return \craft\models\Site
+     * @throws NotFoundHttpException If site parameter exists but site not found
+     */
+    public static function getSiteForRequestAuto(Request $request): \craft\models\Site
+    {
+        $allSites = Craft::$app->getSites()->getAllSites();
+        $isMultiSite = count($allSites) > 1;
+
+        if (!$isMultiSite) {
+            return Craft::$app->getSites()->getPrimarySite();
+        }
+
+        return self::getSiteForRequest($request, true);
+    }
+
+    /**
      * Get the site for the current request, with fallback options
-     * 
+     *
      * @param Request $request The request object
      * @param bool $requireSiteParam Whether to require a site parameter (default: false)
      * @return \craft\models\Site

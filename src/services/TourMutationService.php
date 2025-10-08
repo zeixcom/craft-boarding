@@ -51,7 +51,7 @@ class TourMutationService extends Component
      */
     public function saveTour(array $data): bool
     {
-        $currentSite = SiteHelper::getSiteForRequest($this->request, true);
+        $currentSite = SiteHelper::getSiteForRequestAuto($this->request);
 
         $result = ErrorHandler::wrap(function () use ($data, $currentSite) {
             $this->validateTourData($data);

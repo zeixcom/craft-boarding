@@ -117,7 +117,7 @@ class TourQueryService extends Component
 
             $columns = $this->getExistingTourColumns();
 
-            $currentSite = SiteHelper::getSiteForRequest($this->request, true);
+            $currentSite = SiteHelper::getSiteForRequestAuto($this->request);
 
             $tours = $this->repository->findForUser($user->id, $userGroupIds, [
                 'includeTranslatable' => $columns['hasTranslatable'],
@@ -125,8 +125,6 @@ class TourQueryService extends Component
             ]);
 
             JsonCache::preWarmCache($tours);
-
-            $currentSite = SiteHelper::getSiteForRequest($this->request, true);
             $options = TourProcessor::getUserProcessingOptions($currentSite->id);
             $options['additionalLoaders'] = [
                 'applyTranslations' => function($tour, $siteId) { 
@@ -214,7 +212,7 @@ class TourQueryService extends Component
     public function applyTourTranslations(array $tour, ?int $siteId = null): array
     {
         if ($siteId === null) {
-            $currentSite = SiteHelper::getSiteForRequest($this->request, true);
+            $currentSite = SiteHelper::getSiteForRequestAuto($this->request);
             $siteId = $currentSite->id;
         }
 
