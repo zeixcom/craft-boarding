@@ -44,7 +44,7 @@ class Install extends Migration
         if (!$this->db->tableExists('{{%boarding_tour_completions}}')) {
             $this->createTable('{{%boarding_tour_completions}}', [
                 'id' => $this->primaryKey(),
-                'tourId' => $this->string()->notNull(),
+                'tourId' => $this->integer()->notNull(),
                 'userId' => $this->integer()->notNull(),
                 'dateCreated' => $this->dateTime()->notNull(),
                 'dateUpdated' => $this->dateTime()->notNull(),
@@ -52,6 +52,7 @@ class Install extends Migration
             ]);
 
             $this->createIndex(null, '{{%boarding_tour_completions}}', ['tourId', 'userId'], true);
+            $this->addForeignKey(null, '{{%boarding_tour_completions}}', ['tourId'], '{{%boarding_tours}}', ['id'], 'CASCADE', 'CASCADE');
             $this->addForeignKey(null, '{{%boarding_tour_completions}}', ['userId'], '{{%users}}', ['id'], 'CASCADE');
         }
 

@@ -216,7 +216,7 @@ class TourRepository
                 ])
                 ->from(['tc' => '{{%boarding_tour_completions}}'])
                 ->leftJoin(['u' => '{{%users}}'], '[[u.id]] = [[tc.userId]]')
-                ->where(['tc.tourId' => (string)$tourId])
+                ->where(['tc.tourId' => $tourId])
                 ->orderBy(['tc.dateCreated' => SORT_DESC])
                 ->all();
         } catch (\Exception $e) {
@@ -293,7 +293,7 @@ class TourRepository
         try {
             $exists = (new Query())
                 ->from('{{%boarding_tour_completions}}')
-                ->where(['tourId' => (string)$tourId, 'userId' => $userId])
+                ->where(['tourId' => $tourId, 'userId' => $userId])
                 ->exists();
 
             if ($exists) {
@@ -302,7 +302,7 @@ class TourRepository
 
             Craft::$app->getDb()->createCommand()
                 ->insert('{{%boarding_tour_completions}}', [
-                    'tourId' => (string)$tourId,
+                    'tourId' => $tourId,
                     'userId' => $userId,
                     'dateCreated' => Db::prepareDateForDb(new \DateTime()),
                     'dateUpdated' => Db::prepareDateForDb(new \DateTime()),
@@ -599,20 +599,9 @@ class TourRepository
      */
     private function addCompletionStatus(Query $query, int $userId): void
     {
-        $db = Craft::$app->getDb();
-        $isPostgres = $db->getIsPgsql();
-
-        if ($isPostgres) {
-            // PostgreSQL: Use :: syntax for type casting
-            $joinCondition = '[[t.id]]::text = [[tc.tourId]] AND [[tc.userId]] = :userId';
-        } else {
-            // MySQL: Use CAST AS CHAR
-            $joinCondition = 'CAST([[t.id]] AS CHAR) = [[tc.tourId]] AND [[tc.userId]] = :userId';
-        }
-
         $query->leftJoin(
             ['tc' => '{{%boarding_tour_completions}}'],
-            $joinCondition,
+            '[[t.id]] = [[tc.tourId]] AND [[tc.userId]] = :userId',
             [':userId' => $userId]
         )
             ->addSelect(['CASE WHEN [[tc.id]] IS NOT NULL THEN 1 ELSE 0 END AS completed']);
@@ -742,7 +731,7 @@ class TourRepository
     private function deleteCompletions(int $tourId): void
     {
         Craft::$app->getDb()->createCommand()
-            ->delete('{{%boarding_tour_completions}}', ['tourId' => (string)$tourId])
+            ->delete('{{%boarding_tour_completions}}', ['tourId' => $tourId])
             ->execute();
     }
 
