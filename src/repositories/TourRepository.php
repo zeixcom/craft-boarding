@@ -546,9 +546,18 @@ class TourRepository
         }
 
         if ($options['includeUserGroups']) {
-            $query->addSelect([
-                '(SELECT GROUP_CONCAT(DISTINCT tug.[[userGroupId]]) FROM {{%boarding_tours_usergroups}} tug WHERE tug.[[tourId]] = t.[[id]]) as userGroupIds'
-            ]);
+            $db = Craft::$app->getDb();
+            $isPostgres = $db->getIsPgsql();
+
+            if ($isPostgres) {
+                $query->addSelect([
+                    '(SELECT STRING_AGG(DISTINCT tug.[[userGroupId]]::text, \',\') FROM {{%boarding_tours_usergroups}} tug WHERE tug.[[tourId]] = t.[[id]]) as userGroupIds'
+                ]);
+            } else {
+                $query->addSelect([
+                    '(SELECT GROUP_CONCAT(DISTINCT tug.[[userGroupId]]) FROM {{%boarding_tours_usergroups}} tug WHERE tug.[[tourId]] = t.[[id]]) as userGroupIds'
+                ]);
+            }
         }
 
         return $query;
@@ -590,9 +599,20 @@ class TourRepository
      */
     private function addCompletionStatus(Query $query, int $userId): void
     {
+        $db = Craft::$app->getDb();
+        $isPostgres = $db->getIsPgsql();
+
+        if ($isPostgres) {
+            // PostgreSQL: Use :: syntax for type casting
+            $joinCondition = '[[t.id]]::text = [[tc.tourId]] AND [[tc.userId]] = :userId';
+        } else {
+            // MySQL: Use CAST AS CHAR
+            $joinCondition = 'CAST([[t.id]] AS CHAR) = [[tc.tourId]] AND [[tc.userId]] = :userId';
+        }
+
         $query->leftJoin(
             ['tc' => '{{%boarding_tour_completions}}'],
-            'CAST([[t.id]] AS CHAR) = [[tc.tourId]] AND [[tc.userId]] = :userId',
+            $joinCondition,
             [':userId' => $userId]
         )
             ->addSelect(['CASE WHEN [[tc.id]] IS NOT NULL THEN 1 ELSE 0 END AS completed']);
