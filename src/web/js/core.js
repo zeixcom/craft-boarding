@@ -282,15 +282,21 @@
       };
 
       if (stepData.attachTo && stepData.attachTo.element) {
-        step.attachTo = {
-          element: stepData.attachTo.element,
-          on: stepData.attachTo.on || stepData.position || "bottom",
-        };
+        const element = document.querySelector(stepData.attachTo.element);
+        if (element) {
+          step.attachTo = {
+            element: stepData.attachTo.element,
+            on: stepData.attachTo.on || stepData.position || "bottom",
+          };
+        }
       } else if (stepData.target) {
-        step.attachTo = {
-          element: stepData.target,
-          on: stepData.position || "bottom",
-        };
+        const element = document.querySelector(stepData.target);
+        if (element) {
+          step.attachTo = {
+            element: stepData.target,
+            on: stepData.position || "bottom",
+          };
+        }
       }
 
       if (stepData.type === "navigation") {
