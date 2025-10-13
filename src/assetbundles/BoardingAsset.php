@@ -56,15 +56,4 @@ class BoardingAsset extends AssetBundle
         // Register the rest of the assets normally
         parent::registerAssetFiles($view);
     }
-
-    /**
-     * Get an instance configured for the tour editor
-     * 
-     * @return self
-     */
-    public static function forTourEditor(): self
-    {
-        $bundle = new self();
-        return $bundle;
-    }
 }
