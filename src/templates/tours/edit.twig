@@ -9,7 +9,7 @@
 {% set primarySite = craft.app.sites.primarySite %}
 {% set isTranslatable = tour ? tour.translatable : false %}
 
-{% do view.registerAssetBundle("zeix\\boarding\\assetbundles\\BoardingAsset").forTourEditor() %}
+{% do view.registerAssetBundle("zeix\\boarding\\assetbundles\\BoardingAsset") %}
 
 {% requirePermission 'accessPlugin-boarding' %}
 {% if tour %}

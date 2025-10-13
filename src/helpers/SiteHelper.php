@@ -17,14 +17,7 @@ class SiteHelper
      */
     public static function getSiteForRequestAuto(Request $request): \craft\models\Site
     {
-        $allSites = Craft::$app->getSites()->getAllSites();
-        $isMultiSite = count($allSites) > 1;
-
-        if (!$isMultiSite) {
-            return Craft::$app->getSites()->getPrimarySite();
-        }
-
-        return self::getSiteForRequest($request, true);
+        return self::getSiteForRequest($request, false);
     }
 
     /**
