@@ -592,7 +592,7 @@ class TourRepository
     {
         $query->leftJoin(
             ['tc' => '{{%boarding_tour_completions}}'],
-            'CAST([[t.id]] AS VARCHAR) = [[tc.tourId]] AND [[tc.userId]] = :userId',
+            'CAST([[t.id]] AS CHAR) = [[tc.tourId]] AND [[tc.userId]] = :userId',
             [':userId' => $userId]
         )
             ->addSelect(['CASE WHEN [[tc.id]] IS NOT NULL THEN 1 ELSE 0 END AS completed']);
