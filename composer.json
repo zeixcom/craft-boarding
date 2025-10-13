@@ -2,7 +2,7 @@
     "name": "zeix/craft-boarding",
     "description": "An onboarding plugin for the Control Panel.",
     "type": "craft-plugin",
-    "version": "1.0.10",
+    "version": "1.0.11",
     "keywords": [
         "craft",
         "cms",

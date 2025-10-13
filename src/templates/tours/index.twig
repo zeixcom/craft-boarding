@@ -154,9 +154,10 @@
 							{% if currentUser.can('boarding:edittours') or currentUser.can('boarding:deletetours') %}
 								<td class="thin">
 									<div class="btngroup">
-										{% if currentUser.can('boarding:createtours') %}
+										{% if currentUser.can('boarding:createtours') and not tourLimitReached %}
 											<form method="post" class="inline-form">
 												{{ csrfInput() }}
+
 												{{ actionInput('boarding/tours/duplicate') }}
 												{% if not currentSite.primary %}
 													{{ redirectInput('boarding/tours?site=' ~ currentSite.handle) }}
