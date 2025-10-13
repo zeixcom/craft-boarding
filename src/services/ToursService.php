@@ -248,7 +248,7 @@ class ToursService extends Component
         if (empty($tours)) {
             return [
                 'tours' => [],
-                'isStandardEdition' => \zeix\boarding\Boarding::getInstance()->is(\zeix\boarding\Boarding::EDITION_STANDARD),
+                'isProEdition' => \zeix\boarding\Boarding::getInstance()->is(\zeix\boarding\Boarding::EDITION_PRO),
                 'tourCount' => 0,
                 'tourLimit' => \zeix\boarding\Boarding::LITE_TOUR_LIMIT,
                 'tourLimitReached' => false
@@ -270,13 +270,13 @@ class ToursService extends Component
             }
         }
 
-        $isStandardEdition = \zeix\boarding\Boarding::getInstance()->is(\zeix\boarding\Boarding::EDITION_STANDARD);
+        $isProEdition = \zeix\boarding\Boarding::getInstance()->is(\zeix\boarding\Boarding::EDITION_PRO);
         $tourCount = count($tours);
-        $tourLimitReached = !$isStandardEdition && $tourCount >= \zeix\boarding\Boarding::LITE_TOUR_LIMIT;
+        $tourLimitReached = !$isProEdition && $tourCount >= \zeix\boarding\Boarding::LITE_TOUR_LIMIT;
 
         return [
             'tours' => $tours,
-            'isStandardEdition' => $isStandardEdition,
+            'isProEdition' => $isProEdition,
             'tourCount' => $tourCount,
             'tourLimit' => \zeix\boarding\Boarding::LITE_TOUR_LIMIT,
             'tourLimitReached' => $tourLimitReached
@@ -308,7 +308,7 @@ class ToursService extends Component
             'tour' => $tour,
             'primarySite' => $primarySite,
             'currentSite' => $site,
-            'isStandardEdition' => \zeix\boarding\Boarding::getInstance()->is(\zeix\boarding\Boarding::EDITION_STANDARD)
+            'isProEdition' => \zeix\boarding\Boarding::getInstance()->is(\zeix\boarding\Boarding::EDITION_PRO)
         ];
     }
 }

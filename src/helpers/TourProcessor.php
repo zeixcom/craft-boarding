@@ -11,7 +11,7 @@ namespace zeix\boarding\helpers;
 class TourProcessor
 {
     /**
-     * Process a single tour with all standard transformations
+     * Process a single tour with all pro transformations
      * 
      * @param array $tour Raw tour data
      * @param array $options Processing options

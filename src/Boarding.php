@@ -48,7 +48,7 @@ class Boarding extends Plugin
     /**
      * @var string
      */
-    public const EDITION_STANDARD = 'standard';
+    public const EDITION_PRO = 'pro';
 
     /**
      * @var int Maximum number of tours allowed in Lite edition
@@ -82,7 +82,7 @@ class Boarding extends Plugin
     {
         return [
             self::EDITION_LITE,
-            self::EDITION_STANDARD,
+            self::EDITION_PRO,
         ];
     }
 

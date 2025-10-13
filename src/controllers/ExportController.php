@@ -6,11 +6,11 @@ use Craft;
 use craft\web\Controller;
 use yii\web\Response;
 use zeix\boarding\Boarding;
-use zeix\boarding\controllers\traits\RequiresStandardEdition;
+use zeix\boarding\controllers\traits\RequiresProEdition;
 
 class ExportController extends Controller
 {
-    use RequiresStandardEdition;
+    use RequiresProEdition;
 
     protected array|bool|int $allowAnonymous = self::ALLOW_ANONYMOUS_NEVER;
 
@@ -19,7 +19,7 @@ class ExportController extends Controller
     {
         $this->requirePostRequest();
         $this->requirePermission('accessPlugin-boarding');
-        $this->requireStandardEdition('Import/Export features');
+        $this->requireProEdition('Import/Export features');
 
         $tourId = $this->request->getRequiredBodyParam('id');
         try {
@@ -49,7 +49,7 @@ class ExportController extends Controller
     public function actionExportAllTours(): Response
     {
         $this->requirePermission('accessPlugin-boarding');
-        $this->requireStandardEdition('Import/Export features');
+        $this->requireProEdition('Import/Export features');
 
         try {
             $tours = Boarding::getInstance()->tours->getAllTours();

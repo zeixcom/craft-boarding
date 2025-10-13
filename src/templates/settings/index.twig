@@ -8,7 +8,7 @@
 ] %}
 
 {% block actionButton %}
-    {% if isMultiSite and isStandardEdition %}
+    {% if isMultiSite and isProEdition %}
         <div class="site-selector">
             <div class="btn menubtn" data-icon="world">{{ currentSite.name|t('site') }}</div>
             <div class="menu">
@@ -39,31 +39,31 @@
     {{ forms.selectField({
 		label: "Default Behavior"|t('boarding'),
 		instructions: "Configure how tours behave by default."|t('boarding'),
-		name: (isMultiSite and isStandardEdition ? "siteSettings[defaultBehavior]" : "settings[defaultBehavior]"),
+		name: (isMultiSite and isProEdition ? "siteSettings[defaultBehavior]" : "settings[defaultBehavior]"),
 		options: {
 			'auto': "Autoplay"|t('boarding'),
 			'manual': "Manual"|t('boarding')
 		},
 		first: true,
-		value: (isMultiSite and isStandardEdition ? siteSettings.defaultBehavior : settings.defaultBehavior)
+		value: (isMultiSite and isProEdition ? siteSettings.defaultBehavior : settings.defaultBehavior)
 	}) }}
 
     {{ forms.selectField({
 		label: "Menu Position"|t('boarding'),
 		instructions: "Where should the tours menu appear in the control panel"|t('boarding'),
-		name: (isMultiSite and isStandardEdition ? "siteSettings[buttonPosition]" : "settings[buttonPosition]"),
+		name: (isMultiSite and isProEdition ? "siteSettings[buttonPosition]" : "settings[buttonPosition]"),
 		options: {
 			'header': "Header"|t('boarding'),
 			'sidebar': "Sidebar"|t('boarding'),
 			'none': "Hide"|t('boarding')
 		},
-		value: (isMultiSite and isStandardEdition ? siteSettings.buttonPosition : settings.buttonPosition)
+		value: (isMultiSite and isProEdition ? siteSettings.buttonPosition : settings.buttonPosition)
 	}) }}
 
     {{ forms.textField({
 		label: "Menu Label"|t('boarding'),
-		name: (isMultiSite and isStandardEdition ? "siteSettings[buttonLabel]" : "settings[buttonLabel]"),
-		value: (isMultiSite and isStandardEdition ? siteSettings.buttonLabel : settings.buttonLabel)
+		name: (isMultiSite and isProEdition ? "siteSettings[buttonLabel]" : "settings[buttonLabel]"),
+		value: (isMultiSite and isProEdition ? siteSettings.buttonLabel : settings.buttonLabel)
 	}) }}
 
 
@@ -72,24 +72,24 @@
     {{ forms.textField({
         label: "Back Button Text"|t('boarding'),
         instructions: "Text for the 'Back' button in tours"|t('boarding'),
-        name: (isMultiSite and isStandardEdition ? "siteButtonTexts[backButtonText]" : "settings[backButtonText]"),
-        value: (isMultiSite and isStandardEdition ? siteButtonTexts.backButtonText : settings.backButtonText),
+        name: (isMultiSite and isProEdition ? "siteButtonTexts[backButtonText]" : "settings[backButtonText]"),
+        value: (isMultiSite and isProEdition ? siteButtonTexts.backButtonText : settings.backButtonText),
         placeholder: "Back"
     }) }}
 
     {{ forms.textField({
         label: "Next Button Text"|t('boarding'),
         instructions: "Text for the 'Next' button in tours"|t('boarding'),
-        name: (isMultiSite and isStandardEdition ? "siteButtonTexts[nextButtonText]" : "settings[nextButtonText]"),
-        value: (isMultiSite and isStandardEdition ? siteButtonTexts.nextButtonText : settings.nextButtonText),
+        name: (isMultiSite and isProEdition ? "siteButtonTexts[nextButtonText]" : "settings[nextButtonText]"),
+        value: (isMultiSite and isProEdition ? siteButtonTexts.nextButtonText : settings.nextButtonText),
         placeholder: "Next"
     }) }}
 
     {{ forms.textField({
         label: "Done Button Text"|t('boarding'),
         instructions: "Text for the 'Done' button on the last step of tours"|t('boarding'),
-        name: (isMultiSite and isStandardEdition ? "siteButtonTexts[doneButtonText]" : "settings[doneButtonText]"),
-        value: (isMultiSite and isStandardEdition ? siteButtonTexts.doneButtonText : settings.doneButtonText),
+        name: (isMultiSite and isProEdition ? "siteButtonTexts[doneButtonText]" : "settings[doneButtonText]"),
+        value: (isMultiSite and isProEdition ? siteButtonTexts.doneButtonText : settings.doneButtonText),
         placeholder: "Done"
     }) }}
 

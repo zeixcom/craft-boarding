@@ -7,24 +7,24 @@ use zeix\boarding\Boarding;
 use yii\web\ForbiddenHttpException;
 
 /**
- * RequiresStandardEdition Trait
+ * RequiresProEdition Trait
  *
- * Provides a centralized way to check and enforce Standard Edition requirements
+ * Provides a centralized way to check and enforce Pro Edition requirements
  * across controllers, eliminating code duplication.
  */
-trait RequiresStandardEdition
+trait RequiresProEdition
 {
     /**
-     * Require Standard Edition for the current action
+     * Require Pro Edition for the current action
      *
-     * @param string $featureName The name of the feature requiring Standard Edition
-     * @throws ForbiddenHttpException if not Standard Edition
+     * @param string $featureName The name of the feature requiring Pro Edition
+     * @throws ForbiddenHttpException if not Pro Edition
      */
-    protected function requireStandardEdition(string $featureName = 'This feature'): void
+    protected function requireProEdition(string $featureName = 'This feature'): void
     {
-        if (!Boarding::getInstance()->is(Boarding::EDITION_STANDARD)) {
+        if (!Boarding::getInstance()->is(Boarding::EDITION_PRO)) {
             throw new ForbiddenHttpException(
-                Craft::t('boarding', '{feature} requires Boarding Standard.', [
+                Craft::t('boarding', '{feature} requires Boarding Pro.', [
                     'feature' => $featureName
                 ])
             );
@@ -32,13 +32,13 @@ trait RequiresStandardEdition
     }
 
     /**
-     * Check if Standard edition is active (non-throwing version)
+     * Check if Pro edition is active (non-throwing version)
      *
-     * @return bool True if Standard edition is active
+     * @return bool True if Pro edition is active
      */
-    protected function isStandardEdition(): bool
+    protected function isProEdition(): bool
     {
-        return Boarding::getInstance()->is(Boarding::EDITION_STANDARD);
+        return Boarding::getInstance()->is(Boarding::EDITION_PRO);
     }
 
     /**
@@ -48,13 +48,13 @@ trait RequiresStandardEdition
      */
     protected function getEditionInfo(): array
     {
-        $isStandardEdition = $this->isStandardEdition();
+        $isProEdition = $this->isProEdition();
 
         return [
-            'isStandardEdition' => $isStandardEdition,
-            'editionName' => $isStandardEdition ? 'Standard' : 'Lite',
-            'tourLimit' => $isStandardEdition ? null : Boarding::LITE_TOUR_LIMIT,
-            'hasLimits' => !$isStandardEdition,
+            'isProEdition' => $isProEdition,
+            'editionName' => $isProEdition ? 'Pro' : 'Lite',
+            'tourLimit' => $isProEdition ? null : Boarding::LITE_TOUR_LIMIT,
+            'hasLimits' => !$isProEdition,
         ];
     }
 }

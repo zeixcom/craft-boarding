@@ -7,18 +7,18 @@ use craft\web\Controller;
 use yii\web\Response;
 use zeix\boarding\Boarding;
 use zeix\boarding\config\ImportConfig;
-use zeix\boarding\controllers\traits\RequiresStandardEdition;
+use zeix\boarding\controllers\traits\RequiresProEdition;
 
 class ImportController extends Controller
 {
-    use RequiresStandardEdition;
+    use RequiresProEdition;
 
     protected array|bool|int $allowAnonymous = self::ALLOW_ANONYMOUS_NEVER;
 
     public function actionImport(): Response
     {
         $this->requirePermission('boarding:createtours');
-        $this->requireStandardEdition('Import/Export features');
+        $this->requireProEdition('Import/Export features');
 
         return $this->renderTemplate('boarding/tours/import', [
             'title' => Craft::t('boarding', 'Import Tours')
@@ -29,7 +29,7 @@ class ImportController extends Controller
     {
         $this->requirePostRequest();
         $this->requirePermission('boarding:createtours');
-        $this->requireStandardEdition('Import/Export features');
+        $this->requireProEdition('Import/Export features');
 
         try {
             $uploadedFile = \yii\web\UploadedFile::getInstanceByName('importFile');
