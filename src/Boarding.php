@@ -115,7 +115,6 @@ class Boarding extends Plugin
 
         $this->controllerNamespace = 'zeix\\boarding\\controllers';
 
-        // Register tour save event handler
         Event::on(
             \zeix\boarding\models\Tour::class,
             \zeix\boarding\models\Tour::EVENT_AFTER_SAVE_TOUR,
@@ -166,59 +165,60 @@ class Boarding extends Plugin
             }
         );
 
-        /** @var Settings $settings */
-        $settings = $this->getSettings();
-        $allSites = Craft::$app->getSites()->getAllSites();
+        Craft::$app->onInit(function() {
+            /** @var Settings $settings */
+            $settings = $this->getSettings();
+            $allSites = Craft::$app->getSites()->getAllSites();
 
-        if (Craft::$app->request instanceof \craft\console\Request) {
-            $currentSite = Craft::$app->getSites()->getPrimarySite();
-        } else {
-            $requireSiteParam = count($allSites) > 1;
-            try {
-                $currentSite = SiteHelper::getSiteForRequest(Craft::$app->request, $requireSiteParam);
-            } catch (\Exception $e) {
-                if (Craft::$app->getConfig()->getGeneral()->devMode) {
-                    Craft::warning('Boarding plugin: Site resolution failed - ' . $e->getMessage(), 'boarding');
+            if (Craft::$app->request instanceof \craft\console\Request) {
+                $currentSite = Craft::$app->getSites()->getPrimarySite();
+            } else {
+                $requireSiteParam = count($allSites) > 1;
+                try {
+                    $currentSite = SiteHelper::getSiteForRequest(Craft::$app->request, $requireSiteParam);
+                } catch (\Exception $e) {
+                    if (Craft::$app->getConfig()->getGeneral()->devMode) {
+                        Craft::warning('Boarding plugin: Site resolution failed - ' . $e->getMessage(), 'boarding');
+                    }
+
+                    $currentSite = Craft::$app->getSites()->getCurrentSite();
+                }
+            }
+
+            if (Craft::$app->request->getIsCpRequest()) {
+                if (count($allSites) > 1) {
+                    $siteSettings = $settings->getAllSettingsForSite($currentSite->id);
+                } else {
+                    $siteSettings = [
+                        'defaultBehavior' => $settings->defaultBehavior,
+                        'buttonPosition' => $settings->buttonPosition,
+                        'buttonLabel' => $settings->buttonLabel,
+                        'nextButtonText' => $settings->nextButtonText,
+                        'doneButtonText' => $settings->doneButtonText,
+                        'backButtonText' => $settings->backButtonText,
+                    ];
                 }
 
-                $currentSite = Craft::$app->getSites()->getCurrentSite();
-            }
-        }
+                $view = Craft::$app->getView();
+                $view->registerAssetBundle(BoardingAsset::class);
 
-        // Only register assets and JS settings for CP requests
-        if (Craft::$app->request->getIsCpRequest()) {
-            if (count($allSites) > 1) {
-                $siteSettings = $settings->getAllSettingsForSite($currentSite->id);
-            } else {
-                $siteSettings = [
-                    'defaultBehavior' => $settings->defaultBehavior,
-                    'buttonPosition' => $settings->buttonPosition,
-                    'buttonLabel' => $settings->buttonLabel,
-                    'nextButtonText' => $settings->nextButtonText,
-                    'doneButtonText' => $settings->doneButtonText,
-                    'backButtonText' => $settings->backButtonText,
+                $jsSettings = [
+                    'buttonPosition' => $siteSettings['buttonPosition'],
+                    'defaultBehavior' => $siteSettings['defaultBehavior'],
+                    'buttonLabel' => $siteSettings['buttonLabel'],
+                    'nextButtonText' => $siteSettings['nextButtonText'],
+                    'doneButtonText' => $siteSettings['doneButtonText'],
+                    'backButtonText' => $siteSettings['backButtonText'],
+                    'currentSiteId' => $currentSite->id,
+                    'currentSiteHandle' => $currentSite->handle,
+                    'isMultiSite' => count($allSites) > 1,
                 ];
+
+                $view->registerJs('
+                    window.boardingSettings = ' . json_encode($jsSettings) . ';
+                    ', View::POS_BEGIN);
             }
-
-            $view = Craft::$app->getView();
-            $view->registerAssetBundle(BoardingAsset::class);
-
-            $jsSettings = [
-                'buttonPosition' => $siteSettings['buttonPosition'],
-                'defaultBehavior' => $siteSettings['defaultBehavior'],
-                'buttonLabel' => $siteSettings['buttonLabel'],
-                'nextButtonText' => $siteSettings['nextButtonText'],
-                'doneButtonText' => $siteSettings['doneButtonText'],
-                'backButtonText' => $siteSettings['backButtonText'],
-                'currentSiteId' => $currentSite->id,
-                'currentSiteHandle' => $currentSite->handle,
-                'isMultiSite' => count($allSites) > 1,
-            ];
-
-            $view->registerJs('
-                window.boardingSettings = ' . json_encode($jsSettings) . ';
-                ', View::POS_BEGIN);
-        }
+        });
     }
 
     /**
