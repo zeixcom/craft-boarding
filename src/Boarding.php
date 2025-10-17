@@ -166,26 +166,26 @@ class Boarding extends Plugin
         );
 
         Craft::$app->onInit(function() {
-            /** @var Settings $settings */
-            $settings = $this->getSettings();
-            $allSites = Craft::$app->getSites()->getAllSites();
-
-            if (Craft::$app->request instanceof \craft\console\Request) {
-                $currentSite = Craft::$app->getSites()->getPrimarySite();
-            } else {
-                $requireSiteParam = count($allSites) > 1;
-                try {
-                    $currentSite = SiteHelper::getSiteForRequest(Craft::$app->request, $requireSiteParam);
-                } catch (\Exception $e) {
-                    if (Craft::$app->getConfig()->getGeneral()->devMode) {
-                        Craft::warning('Boarding plugin: Site resolution failed - ' . $e->getMessage(), 'boarding');
-                    }
-
-                    $currentSite = Craft::$app->getSites()->getCurrentSite();
-                }
-            }
-
             if (Craft::$app->request->getIsCpRequest()) {
+                /** @var Settings $settings */
+                $settings = $this->getSettings();
+                $allSites = Craft::$app->getSites()->getAllSites();
+
+                if (Craft::$app->request instanceof \craft\console\Request) {
+                    $currentSite = Craft::$app->getSites()->getPrimarySite();
+                } else {
+                    $requireSiteParam = count($allSites) > 1;
+                    try {
+                        $currentSite = SiteHelper::getSiteForRequest(Craft::$app->request, $requireSiteParam);
+                    } catch (\Exception $e) {
+                        if (Craft::$app->getConfig()->getGeneral()->devMode) {
+                            Craft::warning('Boarding plugin: Site resolution failed - ' . $e->getMessage(), 'boarding');
+                        }
+
+                        $currentSite = Craft::$app->getSites()->getCurrentSite();
+                    }
+                }
+
                 if (count($allSites) > 1) {
                     $siteSettings = $settings->getAllSettingsForSite($currentSite->id);
                 } else {
