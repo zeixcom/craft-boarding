@@ -3,11 +3,12 @@
 {% import "boarding/_macros/tour-edit.twig" as tourMacros %}
 
 {% set tour = tour is defined ? tour : null %}
-{% set title = tour ? "Edit Tour: #{tour.name}"|t('boarding') : "Create New Tour"|t('boarding') %}
+{% set title = tour ? "#{tour.title}"|t('boarding') : "Create New Tour"|t('boarding') %}
+{% set pageTitle = tour ? "Edit Tour: #{tour.title}"|t('boarding') : "Create New Tour"|t('boarding') %}
 {% set currentSite = craft.app.sites.currentSite %}
 {% set sites = craft.app.sites.getAllSites() %}
 {% set primarySite = craft.app.sites.primarySite %}
-{% set isTranslatable = tour ? tour.translatable : false %}
+{% set isProEdition = craft.app.plugins.isPluginEnabled('boarding') and craft.app.plugins.getPlugin('boarding').edition == 'pro' %}
 
 {% do view.registerAssetBundle("zeix\\boarding\\assetbundles\\BoardingAsset") %}
 
@@ -18,15 +19,13 @@
 	{% requirePermission 'boarding:createtours' %}
 {% endif %}
 
-{# In your tour editing template #}
 {% block actionButton %}
-	{% if craft.app.isMultiSite and tour and tour.translatable %}
-
+	{% if craft.app.isMultiSite and isProEdition and availableSites|length > 1 %}
         <div class="site-selector">
             <div class="btn menubtn" data-icon="world">{{ currentSite.name|t('site') }}</div>
             <div class="menu">
                 <ul class="padded">
-                    {% for siteItem in craft.app.sites.getAllSites() %}
+                    {% for siteItem in availableSites %}
                         <li>
                             <a href="{{ url('boarding/tours/edit/' ~ (tour.id ?? 'new'), {site: siteItem.handle}) }}" {% if siteItem.id == currentSite.id %}class="sel"{% endif %}>
                                 {{ siteItem.name|t('site') }}
@@ -57,50 +56,57 @@
 
 			<div class="field-layout">
 				<div class="field-layout-column">
-					{# Enabled field - simplified with macro #}
-					{% if sites|length > 1 %}
-						{{ forms.lightswitchField({
-							label: "Enabled for " ~ currentSite.name|t('app'),
-							id: 'enabled',
-							name: 'siteEnabled[' ~ currentSite.id ~ ']',
-							on: tourMacros.getTourEnabledStatus(tour, currentSite, primarySite, sites) == '1',
-							first: true
-						}) }}
-					{% else %}
-						{{ forms.lightswitchField({
-							label: "Enabled"|t('app'),
-							id: 'enabled',
-							name: 'enabled',
-							on: tour ? (tour.enabled == 1) : true,
-							first: true
-						}) }}
-					{% endif %}
+					{{ forms.lightswitchField({
+						label: "Enabled"|t('app'),
+						id: 'enabled',
+						name: 'enabled',
+						on: tour ? tour.enabled : true,
+						first: true
+					}) }}
 
-					{% if sites|length > 1 and isProEdition %}
-						{{ forms.lightswitchField({
-							label: "Translatable Tour"|t('boarding'),
-							instructions: "Whether this tour should be translatable across sites"|t('boarding'),
-							id: 'translatable',
-							name: 'translatable',
-							on: tour ? tour.translatable == 1 : false,
-						}) }}
-					{% endif %}
+				{% if sites|length > 1 and isProEdition %}
+					{{ forms.selectField({
+						label: "Propagation Method"|t('app'),
+						instructions: "Choose which sites this tour should be saved to"|t('boarding'),
+						id: 'propagationMethod',
+						name: 'propagationMethod',
+						value: tour ? tour.propagationMethod : 'none',
+						options: {
+							'none': {
+								label: 'Save it to the {site} site only'|t('boarding', {site: currentSite.name}),
+							},
+							'all': {
+								label: 'Save it to all sites'|t('boarding'),
+								info: 'The same tour content will be used for all sites'|t('boarding')
+							},
+						'siteGroup': {
+							label: 'Save it to all sites in this site group'|t('boarding'),
+							info: 'Each site in the group can have its own version of this tour'|t('boarding')
+						},
+							'language': {
+								label: 'Save it to sites with the same language'|t('boarding'),
+								info: 'Only sites using the {language} language'|t('boarding', {language: currentSite.language})
+							}
+						},
+						errors: tour ? tour.getErrors('propagationMethod') : null
+					}) }}
+				{% endif %}
 
 					{{ forms.textField({
-						label: "Name"|t('boarding') ~ (isTranslatable ? " (" ~ currentSite.name ~ ")" : ""),
+						label: "Name"|t('boarding'),
 						id: 'name',
 						name: 'name',
-						value: tourMacros.getFieldValue(tour, 'name', currentSite, primarySite, isTranslatable),
+						value: tour ? tour.title : '',
 						required: true,
-						errors: tour.getErrors('name') ?? null,
+						errors: tour ? tour.getErrors('name') : null,
 						class: 'fullwidth'
 					}) }}
 
 					{{ forms.textareaField({
-						label: "Description"|t('boarding') ~ (isTranslatable ? " (" ~ currentSite.name ~ ")" : ""),
+						label: "Description"|t('boarding'),
 						id: 'description',
 						name: 'description',
-						value: tourMacros.getFieldValue(tour, 'description', currentSite, primarySite, isTranslatable),
+						value: tour ? tour.description : '',
 						class: 'nicetext fullwidth',
 						rows: 3
 					}) }}
@@ -118,6 +124,15 @@
 							'footer': 'Step Footer'|t('boarding')
 						},
 						value: tour ? tour.progressPosition : 'off'
+					}) }}
+
+					{{ forms.lightswitchField({
+						label: "Autoplay"|t('boarding'),
+						instructions: "Automatically start this tour for users who haven't completed it yet."|t('boarding'),
+						id: 'autoplay',
+						name: 'autoplay',
+						on: tour ? tour.autoplay : false,
+						errors: tour ? tour.getErrors('autoplay') : null
 					}) }}
 
 					<hr>

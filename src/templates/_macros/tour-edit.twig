@@ -5,7 +5,7 @@
  #}
 
 {# Macro for getting site-specific or global field value #}
-{% macro getFieldValue(tour, fieldName, currentSite, primarySite, isTranslatable) %}
+{% macro getFieldValue(tour, fieldName, currentSite, primarySite) %}
     {%- if isTranslatable and tour and tour.translations and tour.translations[currentSite.id] is defined -%}
         {{- tour.translations[currentSite.id][fieldName] ?? (tour[fieldName] ?? '') -}}
     {%- else -%}

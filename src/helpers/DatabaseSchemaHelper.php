@@ -18,15 +18,6 @@ class DatabaseSchemaHelper
      */
     private static array $columnCache = [];
 
-    /**
-     * Check if the translatable column exists in the tours table
-     * 
-     * @return bool
-     */
-    public static function hasTranslatableColumn(): bool
-    {
-        return self::columnExists('{{%boarding_tours}}', 'translatable');
-    }
 
     /**
      * Check if the progressPosition column exists in the tours table
@@ -39,6 +30,16 @@ class DatabaseSchemaHelper
     }
 
     /**
+     * Check if the autoplay column exists in the tours table
+     * 
+     * @return bool
+     */
+    public static function hasAutoplayColumn(): bool
+    {
+        return self::columnExists('{{%boarding_tours}}', 'autoplay');
+    }
+
+    /**
      * Get all available column information for tours table
      * 
      * @return array Column existence information
@@ -46,8 +47,8 @@ class DatabaseSchemaHelper
     public static function getAvailableColumns(): array
     {
         return [
-            'hasTranslatable' => self::hasTranslatableColumn(),
             'hasProgressPosition' => self::hasProgressPositionColumn(),
+            'hasAutoplay' => self::hasAutoplayColumn(),
         ];
     }
 
@@ -75,15 +76,5 @@ class DatabaseSchemaHelper
             self::$columnCache[$cacheKey] = false;
             return false;
         }
-    }
-
-    /**
-     * Clear the column cache (useful for migrations or testing)
-     * 
-     * @return void
-     */
-    public static function clearCache(): void
-    {
-        self::$columnCache = [];
     }
 }

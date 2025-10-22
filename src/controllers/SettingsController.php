@@ -7,6 +7,7 @@ use craft\web\Controller;
 use yii\web\Response;
 use zeix\boarding\Boarding;
 use zeix\boarding\helpers\SiteHelper;
+use zeix\boarding\models\Settings;
 
 class SettingsController extends Controller
 {
@@ -22,7 +23,7 @@ class SettingsController extends Controller
         $isProEdition = $plugin->is(Boarding::EDITION_PRO);
         $isMultiSite = count($allSites) > 1;
         
-        /** @var \zeix\boarding\models\Settings $settings */
+        /** @var Settings $settings */
         $settings = $plugin->getSettings();
 
         $requireSiteParam = $isMultiSite && $isProEdition;
@@ -51,15 +52,13 @@ class SettingsController extends Controller
         $this->requirePermission('boarding:managetoursettings');
 
         $plugin = Boarding::getInstance();
-        /** @var \zeix\boarding\models\Settings $settings */
+        /** @var Settings $settings */
         $settings = $plugin->getSettings();
         $allSites = Craft::$app->getSites()->getAllSites();
         $isProEdition = $plugin->is(Boarding::EDITION_PRO);
         $isMultiSite = count($allSites) > 1;
-
         $requireSiteParam = $isMultiSite && $isProEdition;
         $currentSite = $requireSiteParam ? SiteHelper::getSiteForRequest($this->request, true) : Craft::$app->getSites()->getPrimarySite();
-
         $postedSettings = $this->request->getBodyParam('settings', []);
         $siteButtonTexts = $this->request->getBodyParam('siteButtonTexts', []);
         $siteGeneralSettings = $this->request->getBodyParam('siteSettings', []);

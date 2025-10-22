@@ -24,10 +24,11 @@ class ExportService extends \craft\base\Component
                 'tourId' => $tour['tourId'],
                 'description' => $tour['description'] ?? '',
                 'enabled' => $tour['enabled'] ?? true,
-                'translatable' => $tour['translatable'] ?? false,
+                'propagationMethod' => $tour['propagationMethod'] ?? 'none',
                 'userGroupIds' => $tour['userGroups'] ?? $tour['userGroupIds'] ?? [],
                 'steps' => $tour['steps'] ?? [],
                 'progressPosition' => $tour['progressPosition'] ?? 'bottom',
+                'autoplay' => $tour['autoplay'] ?? false,
                 'completedBy' => $tour['completedBy'] ?? [],
             ];
 

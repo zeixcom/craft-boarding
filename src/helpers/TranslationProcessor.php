@@ -26,13 +26,22 @@ class TranslationProcessor
             return $tour;
         }
 
-        if (empty($tour['translatable']) || $tour['translatable'] != 1) {
-            return $tour;
+        $propagationMethod = $tour['propagationMethod'] ?? 'none';
+        
+        // For single-site tours with inline step translations (legacy data), fix them
+        if ($propagationMethod === 'none') {
+            return self::fixInlineStepTranslations($tour, $siteId);
         }
 
         if ($primarySiteId === null) {
             $primarySite = Craft::$app->getSites()->getPrimarySite();
             $primarySiteId = $primarySite->id;
+        }
+
+        // For propagating tours (same content across sites), don't apply translations
+        // These tours have propagate: true and share the same content
+        if (in_array($propagationMethod, ['all', 'language', 'siteGroup'])) {
+            return $tour;
         }
 
         if ($siteId == $primarySiteId) {
@@ -53,6 +62,62 @@ class TranslationProcessor
                 $decodedData = JsonCache::decodeTranslationData($translation);
                 if (is_array($decodedData) && isset($decodedData['steps']) && !empty($decodedData['steps'])) {
                     $tour['steps'] = $decodedData['steps'];
+                }
+            }
+        }
+
+        return $tour;
+    }
+    
+    /**
+     * Fix inline step translations for single-site tours (legacy data)
+     * This handles cases where content was saved in translations object instead of main fields
+     * 
+     * @param array $tour The tour data
+     * @param int $siteId The current site ID
+     * @return array The tour with fixed steps
+     */
+    private static function fixInlineStepTranslations(array $tour, int $siteId): array
+    {
+        if (!isset($tour['steps']) || !is_array($tour['steps'])) {
+            return $tour;
+        }
+
+        foreach ($tour['steps'] as &$step) {
+            // Check if main content is empty but translations exist
+            if (isset($step['translations']) && is_array($step['translations'])) {
+                $mainTitleEmpty = empty($step['title']);
+                $mainTextEmpty = empty($step['text']);
+                
+                if ($mainTitleEmpty || $mainTextEmpty) {
+                    // Try current site first
+                    $translation = null;
+                    if (isset($step['translations'][$siteId])) {
+                        $translation = $step['translations'][$siteId];
+                    } elseif (isset($step['translations'][(string)$siteId])) {
+                        $translation = $step['translations'][(string)$siteId];
+                    }
+                    
+                    // Apply translation if found
+                    if ($translation && is_array($translation)) {
+                        if ($mainTitleEmpty && !empty($translation['title'])) {
+                            $step['title'] = $translation['title'];
+                        }
+                        if ($mainTextEmpty && !empty($translation['text'])) {
+                            $step['text'] = $translation['text'];
+                        }
+                    }
+                    
+                    // If still empty, use ANY available translation
+                    if (empty($step['title']) && empty($step['text'])) {
+                        foreach ($step['translations'] as $translationData) {
+                            if (is_array($translationData) && (!empty($translationData['title']) || !empty($translationData['text']))) {
+                                $step['title'] = $translationData['title'] ?? '';
+                                $step['text'] = $translationData['text'] ?? '';
+                                break;
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -98,7 +163,7 @@ class TranslationProcessor
      */
     public static function processTranslatableTour(array $tour, callable $translationLoader): array
     {
-        if (!empty($tour['translatable']) && $tour['translatable'] == 1) {
+        if (self::shouldLoadTranslations($tour)) {
             $tour['translations'] = $translationLoader($tour['id']);
         } else {
             unset($tour['translations']);
@@ -183,13 +248,23 @@ class TranslationProcessor
 
     /**
      * Check if a tour should have translations loaded
-     * 
+     *
      * @param array $tour Tour data
      * @return bool Whether translations should be loaded
      */
     public static function shouldLoadTranslations(array $tour): bool
     {
-        return !empty($tour['translatable']) && $tour['translatable'] == 1;
+        $propagationMethod = $tour['propagationMethod'] ?? 'none';
+
+        // Load translations for methods that allow different content per site:
+        // - 'custom': unique content per site (propagate: false)
+        // - 'language': different content per language
+        // - 'siteGroup': different content per site within group
+        //
+        // 'all' and 'none' don't need translations:
+        // - 'all': same content propagated to all sites
+        // - 'none': single site only
+        return in_array($propagationMethod, ['custom', 'language', 'siteGroup'], true);
     }
 
     /**

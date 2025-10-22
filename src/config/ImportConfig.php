@@ -20,7 +20,7 @@ class ImportConfig
     /**
      * Allowed file extensions for import
      */
-    public const ALLOWED_EXTENSIONS = ['json'];
+    public const ALLOWED_EXTENSIONS = ['json', 'csv', 'xml'];
 
     /**
      * Allowed MIME types for import
@@ -28,7 +28,12 @@ class ImportConfig
     public const ALLOWED_MIME_TYPES = [
         'application/json',
         'text/plain',
-        'application/octet-stream' // Some browsers may use this for .json files
+        'text/csv',
+        'application/csv',
+        'text/comma-separated-values',
+        'application/xml',
+        'text/xml',
+        'application/octet-stream' // Some browsers may use this for .json, .csv or .xml files
     ];
 
     /**
