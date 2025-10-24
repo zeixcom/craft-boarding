@@ -303,6 +303,15 @@ class Tour extends Element
             ]];
         }
 
+        // For new tours, only return the current site to avoid duplicate key errors
+        // The ensureElementSitesEntries() method will add other sites in the group after save
+        if (!$this->id) {
+            return [[
+                'siteId' => $this->siteId,
+                'enabledByDefault' => true,
+            ]];
+        }
+
         // Get all sites in the same group
         $allSites = Craft::$app->getSites()->getAllSites();
         $sitesInGroup = [];
@@ -501,7 +510,10 @@ class Tour extends Element
 
         parent::afterSave($isNew);
 
-        if (!$this->propagating && in_array($this->propagationMethod, [
+        // For language and siteGroup propagation on NEW tours, we need to manually create
+        // elements_sites entries for other sites because getSupportedSites() only returns
+        // the current site on first save to avoid duplicate key errors
+        if ($isNew && !$this->propagating && in_array($this->propagationMethod, [
             self::PROPAGATION_METHOD_LANGUAGE,
             self::PROPAGATION_METHOD_SITE_GROUP
         ])) {

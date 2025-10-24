@@ -157,6 +157,7 @@ class ToursController extends Controller
 
             if (!Craft::$app->getElements()->saveElement($tour)) {
                 Craft::$app->getSession()->setError(Craft::t('boarding', 'Couldn\'t save tour.'));
+                Craft::$app->getUrlManager()->setRouteParams(['tour' => $tour]);
                 return null;
             }
 

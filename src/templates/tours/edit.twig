@@ -179,7 +179,11 @@
 													<label class="required">{{ "Title"|t('boarding') }}</label>
 												</div>
 												<div class="input">
-													{{ tourMacros.stepTranslationField('title', stepIndex, step, currentSite, sites, primarySite) }}
+													{% if tour and tour.propagationMethod == 'none' %}
+														<input class="text fullwidth" type="text" name="steps[{{ stepIndex }}][title]" value="{{ step.title ?? '' }}" required>
+													{% else %}
+														{{ tourMacros.stepTranslationField('title', stepIndex, step, currentSite, sites, primarySite) }}
+													{% endif %}
 												</div>
 											</div>
 
@@ -189,7 +193,11 @@
 													<div class="instructions">{{ "The content that will be shown to users in this step"|t('boarding') }}</div>
 												</div>
 												<div class="input">
-													{{ tourMacros.stepTranslationTextarea('text', stepIndex, step, currentSite, sites, primarySite, 3) }}
+													{% if tour and tour.propagationMethod == 'none' %}
+														<textarea class="nicetext text fullwidth" name="steps[{{ stepIndex }}][text]" rows="3" required>{{ step.text ?? '' }}</textarea>
+													{% else %}
+														{{ tourMacros.stepTranslationTextarea('text', stepIndex, step, currentSite, sites, primarySite, 3) }}
+													{% endif %}
 												</div>
 											</div>
 
@@ -225,7 +233,11 @@
 														<div class="instructions">{{ "The text to display on the navigation button"|t('boarding') }}</div>
 													</div>
 													<div class="input">
-														{{ tourMacros.stepTranslationField('navigationButtonText', stepIndex, step, currentSite, sites, primarySite, false) }}
+														{% if tour and tour.propagationMethod == 'none' %}
+															<input class="text fullwidth" type="text" name="steps[{{ stepIndex }}][navigationButtonText]" value="{{ step.navigationButtonText ?? '' }}">
+														{% else %}
+															{{ tourMacros.stepTranslationField('navigationButtonText', stepIndex, step, currentSite, sites, primarySite, false) }}
+														{% endif %}
 													</div>
 												</div>
 											</div>

@@ -27,7 +27,7 @@ class TranslationProcessor
         }
 
         $propagationMethod = $tour['propagationMethod'] ?? 'none';
-        
+
         // For single-site tours with inline step translations (legacy data), fix them
         if ($propagationMethod === 'none') {
             return self::fixInlineStepTranslations($tour, $siteId);
@@ -68,7 +68,7 @@ class TranslationProcessor
 
         return $tour;
     }
-    
+
     /**
      * Fix inline step translations for single-site tours (legacy data)
      * This handles cases where content was saved in translations object instead of main fields
@@ -83,13 +83,15 @@ class TranslationProcessor
             return $tour;
         }
 
-        foreach ($tour['steps'] as &$step) {
+        foreach ($tour['steps'] as $stepIndex => &$step) {
             // Check if main content is empty but translations exist
             if (isset($step['translations']) && is_array($step['translations'])) {
                 $mainTitleEmpty = empty($step['title']);
                 $mainTextEmpty = empty($step['text']);
-                
-                if ($mainTitleEmpty || $mainTextEmpty) {
+                $isNavigationStep = ($step['type'] ?? 'default') === 'navigation';
+                $mainNavButtonEmpty = $isNavigationStep && empty($step['navigationButtonText']);
+
+                if ($mainTitleEmpty || $mainTextEmpty || $mainNavButtonEmpty) {
                     // Try current site first
                     $translation = null;
                     if (isset($step['translations'][$siteId])) {
@@ -97,7 +99,7 @@ class TranslationProcessor
                     } elseif (isset($step['translations'][(string)$siteId])) {
                         $translation = $step['translations'][(string)$siteId];
                     }
-                    
+
                     // Apply translation if found
                     if ($translation && is_array($translation)) {
                         if ($mainTitleEmpty && !empty($translation['title'])) {
@@ -106,14 +108,20 @@ class TranslationProcessor
                         if ($mainTextEmpty && !empty($translation['text'])) {
                             $step['text'] = $translation['text'];
                         }
+                        if ($mainNavButtonEmpty && !empty($translation['navigationButtonText'])) {
+                            $step['navigationButtonText'] = $translation['navigationButtonText'];
+                        }
                     }
-                    
+
                     // If still empty, use ANY available translation
                     if (empty($step['title']) && empty($step['text'])) {
                         foreach ($step['translations'] as $translationData) {
                             if (is_array($translationData) && (!empty($translationData['title']) || !empty($translationData['text']))) {
                                 $step['title'] = $translationData['title'] ?? '';
                                 $step['text'] = $translationData['text'] ?? '';
+                                if ($isNavigationStep && !empty($translationData['navigationButtonText'])) {
+                                    $step['navigationButtonText'] = $translationData['navigationButtonText'];
+                                }
                                 break;
                             }
                         }

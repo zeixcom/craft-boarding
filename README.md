@@ -66,44 +66,81 @@ composer require zeix/craft-boarding
      - **Target Element**: CSS selector for the element to highlight (e.g., `#main-content`, `.btn.submit`, `[data-attribute="value"]`)
      - **Placement**: Where to show the step relative to the target (`top`, `bottom`, `left`, `right`, `center`)
 
-### Multi-Language Tours and Translations
+### Multi-Site Tours and Propagation Methods
 
-The Boarding Pro edition provides comprehensive support for multi-site and multi-language tours, allowing you to create localized experiences for users across different sites.
+The Boarding Pro edition provides comprehensive support for multi-site installations with flexible propagation methods, allowing you to control how tour content is distributed across different sites.
 
-#### Creating Multi-Language Tours
+#### Tour Propagation Methods
 
-For multi-site installations, follow this recommended workflow to create tours that work across different languages:
+When creating or editing a tour, you can choose how it propagates across your sites:
 
-#### Recommended Workflow
-1. **Create the Base Tour**:
-   - Navigate to **Boarding > New Tour**
-   - Fill in the basic tour information in your primary language
-   - Add all the tour steps with complete content
-   - **Important**: Do not enable translations yet - save the tour first
-   - Click **Save**
+**None (Single Site Only)**
+- Tour exists only on the site where it was created
+- No automatic propagation to other sites
+- Ideal for site-specific onboarding content
 
-2. **Enable Translations**:
-   - After saving, edit the tour again
-   - Toggle the "Translatable Tour" Lightswitch
-   - Click **Save** again
+**All Sites**
+- Tour content is identical across all sites
+- Changes to tour content on any site update all sites
+- Perfect for tours that don't require localization
+- Example: Feature introduction tours that apply universally
 
-3. **Translate Content**:
-   - Use the site switcher in the top-right corner of the tour edit page
-   - Select the site/language you want to translate to
-   - Translate the tour content:
-     - **Tour Name**: Translate to the target language
-     - **Tour Description**: Translate to the target language
-     - **Step Titles**: Translate each step title
-     - **Step Content**: Translate the step content while keeping the same structure
-     - **Target Elements**: Keep the same CSS selectors (these should remain consistent across sites)
-     - **Placement**: Keep the same positioning
-   - Click **Save**
-   - Repeat for each additional language/site
+**Site Group**
+- Tour propagates to all sites within the same site group
+- Each site can have unique content
+- Useful for region-specific or brand-specific tours
+- Example: Tours for different brands sharing the same Craft installation
 
-#### Important Translation Notes
+**Language**
+- Tour propagates to all sites with the same language
+- Content remains identical across sites with matching language settings
+- Changes made on any site with the same language update all matching sites
+- Ideal for multi-domain setups with shared language content
+- Example: English tours shared across example.com and example.co.uk
 
-- **Keep step count consistent**: All language versions have the same amount of steps. Steps can only be deleted in the Primary Site Tour. When steps are deleted in non primary site, it will automatically take the step from the Primary Language Version.
-- **Test each language**: Preview tours in each language to ensure proper targeting and content flow
+#### Creating Tours with Propagation
+
+1. Navigate to **Boarding > New Tour**
+2. Fill in the tour information (name, description, steps)
+3. Select the **Propagation Method** from the dropdown
+4. Click **Save**
+5. The tour will automatically be available on the appropriate sites based on your chosen propagation method
+
+#### Editing Multi-Site Tours
+
+**Site Selector**
+- When editing a tour, the site selector in the top-right corner shows only sites where the tour exists
+- Switch between sites to edit site-specific content (for Site Group propagation)
+- Changes to shared content (All Sites, Language) automatically update all applicable sites
+
+**Content Behavior by Propagation Method**
+
+For **All Sites** and **Language** propagation:
+- Tour name, description, and steps remain synchronized
+- Editing on any applicable site updates all sites
+- No per-site variations allowed
+
+For **Site Group** propagation:
+- Each site can have unique tour content
+- Edit tour independently on each site in the group
+- Changes only affect the current site
+
+For **None** propagation:
+- Tour only exists on the creation site
+- No site selector appears (single site only)
+
+#### Best Practices
+
+**Choosing the Right Propagation Method**
+- Use **None** for site-specific tutorials (e.g., "Managing Your Inventory" for an e-commerce site)
+- Use **All Sites** for universal features (e.g., "How to Create a Blog Post")
+- Use **Site Group** for brand-specific content across related sites
+- Use **Language** for consistent content across sites with the same language
+
+**Testing Multi-Site Tours**
+- Test tours on each applicable site to ensure proper element targeting
+- Verify that CSS selectors work across all sites
+- Confirm that tours appear for the correct user groups
 
 #### Import/Export with Translations
 

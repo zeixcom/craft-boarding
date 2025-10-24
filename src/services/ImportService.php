@@ -45,13 +45,9 @@ class ImportService extends Component
                 // Check if tour with this tourId already exists
                 $tourRepository = new TourRepository();
                 $existingTour = $tourRepository->findByTourId($tourData['tourId']);
-                
+
                 if ($existingTour) {
-                    Craft::info("Tour '{$tourData['name']}' (tourId: {$tourData['tourId']}) already exists - will be updated", 'boarding');
-                    // Preserve the existing tour's database ID for update
                     $tourData['id'] = $existingTour['id'];
-                } else {
-                    Craft::info("Tour '{$tourData['name']}' (tourId: {$tourData['tourId']}) is new - will be created", 'boarding');
                 }
 
                 $tourData = array_merge([
@@ -84,16 +80,14 @@ class ImportService extends Component
                 // Save tour as a proper Craft element
                 try {
                     if ($existingTour) {
-                        // Load existing tour element
                         $tour = Tour::find()->id($existingTour['id'])->status(null)->one();
                         if (!$tour) {
                             throw new \Exception('Could not load existing tour');
                         }
                     } else {
-                        // Create new tour element
                         $tour = new Tour();
                     }
-                    
+
                     // Map data to tour element properties
                     $tour->title = $tourData['name'];
                     $tour->tourId = $tourData['tourId'];
@@ -105,19 +99,17 @@ class ImportService extends Component
                     $tour->userGroupIds = $tourData['userGroupIds'];
                     // Tour model's data property expects a JSON string with steps
                     $tour->data = json_encode(['steps' => $tourData['steps']]);
-                    
+
                     // Save via Craft's element system
                     if (Craft::$app->getElements()->saveElement($tour)) {
                         if (!empty($tourData['completedBy'])) {
                             $this->importTourCompletions($tourData['tourId'], $tourData['completedBy'], $results, $index);
                         }
-                        
+
                         if ($existingTour) {
                             $results['updated']++;
-                            Craft::info("Successfully updated tour: {$tour->title}", 'boarding');
                         } else {
                             $results['imported']++;
-                            Craft::info("Successfully imported tour: {$tour->title}", 'boarding');
                         }
                     } else {
                         $errors = $tour->getErrors();
@@ -158,19 +150,19 @@ class ImportService extends Component
     public function buildDetailedImportMessage(array $results): string
     {
         $parts = [];
-        
+
         if ($results['imported'] > 0) {
             $parts[] = Craft::t('boarding', '{count} imported', ['count' => $results['imported']]);
         }
-        
+
         if ($results['updated'] > 0) {
             $parts[] = Craft::t('boarding', '{count} updated', ['count' => $results['updated']]);
         }
-        
+
         if ($results['skipped'] > 0) {
             $parts[] = Craft::t('boarding', '{count} skipped', ['count' => $results['skipped']]);
         }
-        
+
         $message = Craft::t('boarding', 'Import completed: {summary}', [
             'summary' => implode(', ', $parts) ?: '0 tours processed'
         ]);
@@ -286,8 +278,10 @@ class ImportService extends Component
         }
 
         // Validate progressPosition if present
-        if (isset($tour['progressPosition']) &&
-            !in_array($tour['progressPosition'], ImportConfig::VALID_PROGRESS_POSITIONS)) {
+        if (
+            isset($tour['progressPosition']) &&
+            !in_array($tour['progressPosition'], ImportConfig::VALID_PROGRESS_POSITIONS)
+        ) {
             $errors[] = Craft::t('boarding', 'Tour #{num}: Invalid progressPosition value "{value}"', [
                 'num' => $tourNum,
                 'value' => $tour['progressPosition']
@@ -295,8 +289,10 @@ class ImportService extends Component
         }
 
         // Validate boolean fields
-        if (isset($tour['enabled']) && !is_bool($tour['enabled']) &&
-            !in_array($tour['enabled'], [0, 1, '0', '1', true, false])) {
+        if (
+            isset($tour['enabled']) && !is_bool($tour['enabled']) &&
+            !in_array($tour['enabled'], [0, 1, '0', '1', true, false])
+        ) {
             $errors[] = Craft::t('boarding', 'Tour #{num}: Invalid enabled value', [
                 'num' => $tourNum
             ]);
@@ -478,16 +474,24 @@ class ImportService extends Component
      */
     private function transformCsvRowToTour(array $row): ?array
     {
-        // Log the incoming row for debugging
-        Craft::info('CSV Row received: ' . json_encode(array_keys($row)), 'boarding');
-        
         // Fields to ignore (Craft element system fields that shouldn't be imported)
         $systemFields = [
-            'id', 'canonicalid', 'fieldlayoutid', 'uid', 'archived', 
-            'datelastmerged', 'datecreated', 'dateupdated', 'sitesettingsid', 
-            'siteid', 'slug', 'uri', 'content', 'enabledforsite'
+            'id',
+            'canonicalid',
+            'fieldlayoutid',
+            'uid',
+            'archived',
+            'datelastmerged',
+            'datecreated',
+            'dateupdated',
+            'sitesettingsid',
+            'siteid',
+            'slug',
+            'uri',
+            'content',
+            'enabledforsite'
         ];
-        
+
         // Map CSV column names to expected tour fields (case-insensitive)
         $columnMap = [
             'title' => 'name',
@@ -513,20 +517,18 @@ class ImportService extends Component
         // Map columns to tour fields, skipping system fields
         foreach ($row as $key => $value) {
             $normalizedKey = strtolower(trim(str_replace([' ', '-', '_', "\xEF\xBB\xBF"], '', $key))); // Also remove BOM
-            
+
             // Skip system fields
             if (in_array($normalizedKey, $systemFields)) {
                 continue;
             }
-            
+
             $mappedKey = $columnMap[$normalizedKey] ?? null;
 
             if ($mappedKey) {
                 $tour[$mappedKey] = trim($value);
             }
         }
-        
-        Craft::info('Mapped tour data (after filtering): ' . json_encode($tour), 'boarding');
 
         // Skip if missing required fields
         if (empty($tour['name'])) {
@@ -549,18 +551,15 @@ class ImportService extends Component
 
         // Parse data field if present (Craft element export format)
         if (isset($tour['data']) && !empty($tour['data'])) {
-            Craft::info('Parsing data field: ' . substr($tour['data'], 0, 200), 'boarding');
             $decoded = json_decode($tour['data'], true);
             if (json_last_error() === JSON_ERROR_NONE && isset($decoded['steps'])) {
                 $tour['steps'] = $decoded['steps'];
-                Craft::info('Extracted ' . count($tour['steps']) . ' steps from data field', 'boarding');
             } else {
-                Craft::warning('Failed to parse data field JSON: ' . json_last_error_msg(), 'boarding');
                 $tour['steps'] = [];
             }
             unset($tour['data']); // Remove the data field after parsing
         }
-        
+
         // Parse steps JSON if present (direct steps column)
         if (isset($tour['steps']) && is_string($tour['steps']) && !empty($tour['steps'])) {
             $decoded = json_decode($tour['steps'], true);
@@ -622,10 +621,10 @@ class ImportService extends Component
 
         // Suppress XML parsing errors and handle them manually
         libxml_use_internal_errors(true);
-        
+
         try {
             $xml = simplexml_load_string($xmlContent);
-            
+
             if ($xml === false) {
                 $errors = libxml_get_errors();
                 $errorMsg = !empty($errors) ? $errors[0]->message : 'Unknown XML parsing error';
@@ -636,7 +635,7 @@ class ImportService extends Component
             }
 
             $tours = [];
-            
+
             // Check if XML has the expected Craft element export structure
             // Craft exports elements with a root element and child elements
             foreach ($xml->children() as $element) {
@@ -647,9 +646,7 @@ class ImportService extends Component
             }
 
             libxml_clear_errors();
-            
-            Craft::info('Parsed ' . count($tours) . ' tours from XML file', 'boarding');
-            
+
             return $tours;
         } catch (\Exception $e) {
             libxml_clear_errors();
@@ -665,17 +662,26 @@ class ImportService extends Component
      */
     private function transformXmlElementToTour(\SimpleXMLElement $element): ?array
     {
-        Craft::info('Processing XML element: ' . $element->getName(), 'boarding');
-        
         $tour = [];
-        
+
         // System fields to ignore (same as CSV)
         $systemFields = [
-            'id', 'canonicalId', 'fieldLayoutId', 'uid', 'archived', 
-            'dateLastMerged', 'dateCreated', 'dateUpdated', 'siteSettingsId', 
-            'siteId', 'slug', 'uri', 'content', 'enabledForSite'
+            'id',
+            'canonicalId',
+            'fieldLayoutId',
+            'uid',
+            'archived',
+            'dateLastMerged',
+            'dateCreated',
+            'dateUpdated',
+            'siteSettingsId',
+            'siteId',
+            'slug',
+            'uri',
+            'content',
+            'enabledForSite'
         ];
-        
+
         // Map XML elements/attributes to tour fields
         $fieldMap = [
             'title' => 'name',
@@ -689,50 +695,47 @@ class ImportService extends Component
             'userGroupIds' => 'userGroupIds',
             'data' => 'data',
         ];
-        
+
         // Process each child element
         foreach ($element->children() as $child) {
             $fieldName = $child->getName();
-            
+
             // Skip system fields
             if (in_array($fieldName, $systemFields)) {
                 continue;
             }
-            
+
             $mappedName = $fieldMap[$fieldName] ?? null;
-            
+
             if ($mappedName) {
                 $value = (string)$child;
                 $tour[$mappedName] = $value;
             }
         }
-        
+
         // Also check for attributes (some exports use attributes)
         foreach ($element->attributes() as $attrName => $attrValue) {
             if (in_array($attrName, $systemFields)) {
                 continue;
             }
-            
+
             $mappedName = $fieldMap[$attrName] ?? null;
-            
+
             if ($mappedName && !isset($tour[$mappedName])) {
                 $tour[$mappedName] = (string)$attrValue;
             }
         }
-        
-        Craft::info('Mapped XML tour data: ' . json_encode($tour), 'boarding');
-        
+
         // Skip if missing required name field
         if (empty($tour['name'])) {
-            Craft::warning('Skipping XML element - missing name field', 'boarding');
             return null;
         }
-        
+
         // Generate tourId if not provided
         if (empty($tour['tourId'])) {
             $tour['tourId'] = 'tour_' . StringHelper::UUID();
         }
-        
+
         // Parse boolean fields
         if (isset($tour['enabled'])) {
             $tour['enabled'] = $this->parseBooleanValue($tour['enabled']);
@@ -741,28 +744,25 @@ class ImportService extends Component
         if (isset($tour['autoplay'])) {
             $tour['autoplay'] = $this->parseBooleanValue($tour['autoplay']);
         }
-        
+
         // Parse data field if present (contains steps JSON)
         if (isset($tour['data']) && !empty($tour['data'])) {
-            Craft::info('Parsing XML data field: ' . substr($tour['data'], 0, 200), 'boarding');
             $decoded = json_decode($tour['data'], true);
             if (json_last_error() === JSON_ERROR_NONE && isset($decoded['steps'])) {
                 $tour['steps'] = $decoded['steps'];
-                Craft::info('Extracted ' . count($tour['steps']) . ' steps from XML data field', 'boarding');
             } else {
-                Craft::warning('Failed to parse data field JSON from XML: ' . json_last_error_msg(), 'boarding');
                 $tour['steps'] = [];
             }
             unset($tour['data']);
         }
-        
+
         // Parse userGroupIds
         if (isset($tour['userGroupIds']) && !empty($tour['userGroupIds'])) {
             if (is_string($tour['userGroupIds'])) {
                 $tour['userGroupIds'] = array_filter(array_map('intval', explode(',', $tour['userGroupIds'])));
             }
         }
-        
+
         return $tour;
     }
 }

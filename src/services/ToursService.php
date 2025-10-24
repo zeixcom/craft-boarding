@@ -152,16 +152,22 @@ class ToursService extends Component
             $currentSite = SiteHelper::getSiteForRequestAuto($this->request);
             $isAdmin = $user->admin;
 
+            Logger::info('getToursForCurrentUser: User ID: ' . $user->id . ', isAdmin: ' . ($isAdmin ? 'yes' : 'no') . ', userGroupIds: ' . json_encode($userGroupIds), 'boarding');
+
             $query = Tour::find()
                 ->siteId($currentSite->id)
                 ->status(null)
                 ->orderBy(['dateCreated' => SORT_DESC]);
 
             if (!$isAdmin) {
+                Logger::info('getToursForCurrentUser: Applying userGroupId filter', 'boarding');
                 $query->userGroupId($userGroupIds);
+            } else {
+                Logger::info('getToursForCurrentUser: Skipping userGroupId filter (admin user)', 'boarding');
             }
 
             $tourElements = $query->all();
+            Logger::info('getToursForCurrentUser: Found ' . count($tourElements) . ' tours', 'boarding');
 
             $tours = [];
             foreach ($tourElements as $tour) {
@@ -683,16 +689,26 @@ class ToursService extends Component
         $propagationMethod = $tour->propagationMethod;
         $siteId = $tour->siteId;
 
+        Logger::info('processStepsForSave - Tour ID: ' . ($tour->id ?? 'new') . ', propagationMethod: ' . $propagationMethod . ', siteId: ' . $siteId, 'boarding');
+        Logger::info('processStepsForSave - Raw steps from form: ' . json_encode($steps), 'boarding');
+
         if ($propagationMethod === 'all' || $propagationMethod === 'language') {
             // All sites or language: Same content everywhere, strip translations
-            return $this->normalizeStepsForPropagation($steps, $siteId);
+            $result = $this->normalizeStepsForPropagation($steps, $siteId);
+            Logger::info('processStepsForSave - After normalizeStepsForPropagation: ' . json_encode($result), 'boarding');
+            return $result;
         } elseif ($propagationMethod === 'none') {
             // Single site only: Process normally, then normalize for single site
             $processedSteps = $this->processStepsData($steps);
-            return $this->normalizeStepsForSingleSite($processedSteps, $siteId);
+            Logger::info('processStepsForSave - After processStepsData: ' . json_encode($processedSteps), 'boarding');
+            $result = $this->normalizeStepsForSingleSite($processedSteps, $siteId);
+            Logger::info('processStepsForSave - After normalizeStepsForSingleSite: ' . json_encode($result), 'boarding');
+            return $result;
         } else {
             // SiteGroup/Custom: Keep translations for site-specific content
-            return $this->processStepsData($steps);
+            $result = $this->processStepsData($steps);
+            Logger::info('processStepsForSave - After processStepsData (site group): ' . json_encode($result), 'boarding');
+            return $result;
         }
     }
 
