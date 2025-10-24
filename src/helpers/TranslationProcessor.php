@@ -38,9 +38,9 @@ class TranslationProcessor
             $primarySiteId = $primarySite->id;
         }
 
-        // For propagating tours (same content across sites), don't apply translations
-        // These tours have propagate: true and share the same content
-        if (in_array($propagationMethod, ['all', 'language', 'siteGroup'])) {
+        // For 'all' and 'language' propagation (same content across sites), don't apply translations
+        // For 'siteGroup', we DO apply translations because each site has different content
+        if (in_array($propagationMethod, ['all', 'language'])) {
             return $tour;
         }
 

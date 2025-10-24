@@ -520,8 +520,14 @@ class Tour extends Element
             $this->ensureElementSitesEntries();
         }
 
+        // Propagate data to all language sites (same content)
         if (!$this->propagating && $this->propagationMethod === self::PROPAGATION_METHOD_LANGUAGE) {
             $this->propagateDataToLanguageSites();
+        }
+
+        // Propagate data to all site group sites on first save (different content per site)
+        if ($isNew && !$this->propagating && $this->propagationMethod === self::PROPAGATION_METHOD_SITE_GROUP) {
+            $this->propagateDataToSiteGroupSites();
         }
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_SAVE_TOUR)) {
@@ -613,6 +619,52 @@ class Tour extends Element
                         'siteId' => $site->id,
                     ]
                 )->execute();
+            }
+        }
+    }
+
+    /**
+     * Propagate data (steps) to all sites in the same site group
+     * Only called on first save to initialize content for all sites
+     * Uses translations table since boarding_tours has a single-id PRIMARY KEY
+     */
+    private function propagateDataToSiteGroupSites(): void
+    {
+        $currentSite = Craft::$app->getSites()->getSiteById($this->siteId);
+        if (!$currentSite) {
+            return;
+        }
+
+        // Decode current data to get steps
+        $decodedData = json_decode($this->getRawData(), true);
+        $steps = $decodedData['steps'] ?? [];
+
+        $allSites = Craft::$app->getSites()->getAllSites();
+        foreach ($allSites as $site) {
+            if ($site->groupId === $currentSite->groupId && $site->id !== $this->siteId) {
+                // Store in translations table
+                $exists = (new \yii\db\Query())
+                    ->from('{{%boarding_tours_i18n}}')
+                    ->where(['tourId' => $this->id, 'siteId' => $site->id])
+                    ->exists();
+
+                $translationData = json_encode(['steps' => $steps]);
+
+                if ($exists) {
+                    Craft::$app->getDb()->createCommand()->update(
+                        '{{%boarding_tours_i18n}}',
+                        ['data' => $translationData],
+                        ['tourId' => $this->id, 'siteId' => $site->id]
+                    )->execute();
+                } else {
+                    Craft::$app->getDb()->createCommand()->insert('{{%boarding_tours_i18n}}', [
+                        'tourId' => $this->id,
+                        'siteId' => $site->id,
+                        'name' => $this->title,
+                        'description' => $this->description,
+                        'data' => $translationData,
+                    ])->execute();
+                }
             }
         }
     }
