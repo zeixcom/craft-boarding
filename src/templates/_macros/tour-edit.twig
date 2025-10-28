@@ -5,7 +5,7 @@
  #}
 
 {# Macro for getting site-specific or global field value #}
-{% macro getFieldValue(tour, fieldName, currentSite, primarySite, isTranslatable) %}
+{% macro getFieldValue(tour, fieldName, currentSite, primarySite) %}
     {%- if isTranslatable and tour and tour.translations and tour.translations[currentSite.id] is defined -%}
         {{- tour.translations[currentSite.id][fieldName] ?? (tour[fieldName] ?? '') -}}
     {%- else -%}
@@ -62,18 +62,20 @@
         {%- endif -%}
 
         <input class="text fullwidth" type="text" name="steps[{{ stepIndex }}][translations][{{ currentSite.id }}][{{ fieldName }}]" value="{{ currentSiteValue }}" {{ required ? 'required' : '' }}>
-        
-        {# Hidden primary site field #}
-        <input type="hidden" name="steps[{{ stepIndex }}][{{ fieldName }}]" value="{{ step[fieldName] ?? '' }}">
-        
-        {# Hidden other site translations #}
+
+        {# Hidden primary site field - use current site value if main field is empty #}
+        <input type="hidden" name="steps[{{ stepIndex }}][{{ fieldName }}]" value="{{ (step[fieldName] is defined and step[fieldName] != '') ? step[fieldName] : currentSiteValue }}">
+
+        {# Hidden other site translations - use current site value as fallback if translation and main field are empty #}
         {%- for site in sites -%}
             {%- if site.id != currentSite.id and site.id != primarySite.id -%}
                 {%- set otherSiteValue = '' -%}
-                {%- if step.translations is defined and step.translations[site.id] is defined -%}
-                    {%- set otherSiteValue = step.translations[site.id][fieldName] ?? '' -%}
+                {%- if step.translations is defined and step.translations[site.id] is defined and step.translations[site.id][fieldName] is defined and step.translations[site.id][fieldName] != '' -%}
+                    {%- set otherSiteValue = step.translations[site.id][fieldName] -%}
+                {%- elseif step[fieldName] is defined and step[fieldName] != '' -%}
+                    {%- set otherSiteValue = step[fieldName] -%}
                 {%- else -%}
-                    {%- set otherSiteValue = step[fieldName] ?? '' -%}
+                    {%- set otherSiteValue = currentSiteValue -%}
                 {%- endif -%}
                 <input type="hidden" name="steps[{{ stepIndex }}][translations][{{ site.id }}][{{ fieldName }}]" value="{{ otherSiteValue }}">
             {%- endif -%}
@@ -104,18 +106,22 @@
         {%- else -%}
             {%- set currentSiteValue = step[fieldName] ?? '' -%}
         {%- endif -%}
-        
+
         <textarea class="nicetext text fullwidth" name="steps[{{ stepIndex }}][translations][{{ currentSite.id }}][{{ fieldName }}]" rows="{{ rows }}" required>{{ currentSiteValue }}</textarea>
-        
-        <input type="hidden" name="steps[{{ stepIndex }}][{{ fieldName }}]" value="{{ step[fieldName] ?? '' }}">
-        
+
+        {# Hidden primary site field - use current site value if main field is empty #}
+        <input type="hidden" name="steps[{{ stepIndex }}][{{ fieldName }}]" value="{{ (step[fieldName] is defined and step[fieldName] != '') ? step[fieldName] : currentSiteValue }}">
+
+        {# Hidden other site translations - use current site value as fallback if translation and main field are empty #}
         {%- for site in sites -%}
             {%- if site.id != currentSite.id and site.id != primarySite.id -%}
                 {%- set otherSiteValue = '' -%}
-                {%- if step.translations is defined and step.translations[site.id] is defined -%}
-                    {%- set otherSiteValue = step.translations[site.id][fieldName] ?? '' -%}
+                {%- if step.translations is defined and step.translations[site.id] is defined and step.translations[site.id][fieldName] is defined and step.translations[site.id][fieldName] != '' -%}
+                    {%- set otherSiteValue = step.translations[site.id][fieldName] -%}
+                {%- elseif step[fieldName] is defined and step[fieldName] != '' -%}
+                    {%- set otherSiteValue = step[fieldName] -%}
                 {%- else -%}
-                    {%- set otherSiteValue = step[fieldName] ?? '' -%}
+                    {%- set otherSiteValue = currentSiteValue -%}
                 {%- endif -%}
                 <input type="hidden" name="steps[{{ stepIndex }}][translations][{{ site.id }}][{{ fieldName }}]" value="{{ otherSiteValue }}">
             {%- endif -%}

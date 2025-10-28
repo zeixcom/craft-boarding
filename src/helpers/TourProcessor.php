@@ -30,7 +30,6 @@ class TourProcessor
             'processProgress' => false,
             'ensureStepsArray' => true,
             'siteId' => null,
-            'hasTranslatableColumn' => true,
         ];
 
         $options = array_merge($defaultOptions, $options);
@@ -40,11 +39,17 @@ class TourProcessor
             return $processedTour;
         }
 
-        if (!$options['hasTranslatableColumn']) {
-            $processedTour['translatable'] = false;
-        } elseif (isset($processedTour['translatable'])) {
-            // Convert numeric translatable values to boolean
-            $processedTour['translatable'] = (bool) $processedTour['translatable'];
+
+        // Convert numeric autoplay values to boolean
+        if (isset($processedTour['autoplay'])) {
+            $processedTour['autoplay'] = (bool) $processedTour['autoplay'];
+        } else {
+            $processedTour['autoplay'] = false;
+        }
+
+        // Convert numeric enabled values to boolean
+        if (isset($processedTour['enabled'])) {
+            $processedTour['enabled'] = (bool) $processedTour['enabled'];
         }
 
         if ($options['loadUserGroups']) {
@@ -243,7 +248,7 @@ class TourProcessor
      */
     private static function applyTranslations(array $tour, int $siteId, array $loaders): array
     {
-        if (isset($tour['translatable']) && $tour['translatable'] && isset($loaders['applyTranslations'])) {
+        if (isset($loaders['applyTranslations']) && TranslationProcessor::shouldLoadTranslations($tour)) {
             return $loaders['applyTranslations']($tour, $siteId);
         }
 
@@ -330,7 +335,6 @@ class TourProcessor
             'applyTranslations' => false,
             'processProgress' => false,
             'ensureStepsArray' => false,
-            'hasTranslatableColumn' => $columns['hasTranslatable'] ?? true,
         ];
     }
 

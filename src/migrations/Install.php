@@ -22,7 +22,9 @@ class Install extends Migration
                 'data' => $this->text(),
                 'enabled' => $this->boolean()->notNull()->defaultValue(true),
                 'translatable' => $this->boolean()->notNull()->defaultValue(false),
+                'propagationMethod' => $this->string(20)->defaultValue('none')->notNull(),
                 'progressPosition' => $this->string(10)->defaultValue('off')->notNull(),
+                'autoplay' => $this->boolean()->notNull()->defaultValue(false),
                 'dateCreated' => $this->dateTime()->notNull(),
                 'dateUpdated' => $this->dateTime()->notNull(),
                 'uid' => $this->uid(),
@@ -35,6 +37,17 @@ class Install extends Migration
                 '{{%boarding_tours}}',
                 'siteId',
                 '{{%sites}}',
+                'id',
+                'CASCADE',
+                'CASCADE'
+            );
+
+            // Add foreign key to elements table for Craft element integration
+            $this->addForeignKey(
+                null,
+                '{{%boarding_tours}}',
+                'id',
+                '{{%elements}}',
                 'id',
                 'CASCADE',
                 'CASCADE'
@@ -154,7 +167,63 @@ class Install extends Migration
                 ->scalar();
         }
 
+        // Create element entries for all tours (needed for Craft element integration)
+        $this->createElementEntries();
+
         return true;
+    }
+
+    /**
+     * Create element entries for all tours (needed for Craft element integration)
+     */
+    private function createElementEntries(): void
+    {
+        $tours = (new \craft\db\Query())
+            ->select(['id', 'siteId', 'tourId', 'name', 'enabled', 'dateCreated', 'dateUpdated', 'uid'])
+            ->from('{{%boarding_tours}}')
+            ->all();
+            
+        foreach ($tours as $tour) {
+            // Check if element entry exists
+            $elementExists = (new \craft\db\Query())
+                ->select(['id'])
+                ->from('{{%elements}}')
+                ->where(['id' => $tour['id']])
+                ->exists();
+                
+            if (!$elementExists) {
+                // Create element entry
+                $this->insert('{{%elements}}', [
+                    'id' => $tour['id'],
+                    'canonicalId' => $tour['id'],
+                    'draftId' => null,
+                    'revisionId' => null,
+                    'fieldLayoutId' => null,
+                    'type' => 'zeix\\boarding\\models\\Tour',
+                    'enabled' => $tour['enabled'],
+                    'archived' => false,
+                    'dateCreated' => $tour['dateCreated'],
+                    'dateUpdated' => $tour['dateUpdated'],
+                    'dateLastMerged' => null,
+                    'dateDeleted' => null,
+                    'uid' => $tour['uid'],
+                ]);
+                
+                // Create elements_sites entry
+                $this->insert('{{%elements_sites}}', [
+                    'elementId' => $tour['id'],
+                    'siteId' => $tour['siteId'],
+                    'slug' => \craft\helpers\ElementHelper::generateSlug($tour['name']),
+                    'uri' => null,
+                    'enabled' => $tour['enabled'],
+                    'dateCreated' => $tour['dateCreated'],
+                    'dateUpdated' => $tour['dateUpdated'],
+                    'uid' => \craft\helpers\StringHelper::UUID(),
+                ]);
+                
+                echo "Created element entries for tour #{$tour['id']}: {$tour['name']}\n";
+            }
+        }
     }
 
     /**

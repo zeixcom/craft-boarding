@@ -10,11 +10,6 @@ use craft\base\Model;
 class Settings extends Model
 {
     /**
-     * @var string|null The default behavior for tours ('auto', 'manual')
-     */
-    public ?string $defaultBehavior = 'manual';
-
-    /**
      * @var string|null The position of the tours button ('header', 'sidebar', 'none')
      */
     public ?string $buttonPosition = 'header';
@@ -56,7 +51,6 @@ class Settings extends Model
     public function attributeLabels(): array
     {
         return [
-            'defaultBehavior' => 'Default Behavior',
             'buttonPosition' => 'Button Position',
             'buttonLabel' => 'Button Label',
             'nextButtonText' => 'Next Button Text',
@@ -73,9 +67,7 @@ class Settings extends Model
     public function rules(): array
     {
         return [
-            ['defaultBehavior', 'default', 'value' => 'manual'],
             ['buttonPosition', 'default', 'value' => 'header'],
-            ['defaultBehavior', 'in', 'range' => ['auto', 'manual']],
             ['buttonPosition', 'in', 'range' => ['header', 'sidebar', 'none']],
             ['buttonLabel', 'default', 'value' => 'Tours'],
             ['nextButtonText', 'default', 'value' => 'Next'],
@@ -138,7 +130,6 @@ class Settings extends Model
         $siteSettings = $this->siteSettings[$siteId] ?? [];
         
         return [
-            'defaultBehavior' => $siteSettings['defaultBehavior'] ?? $this->defaultBehavior,
             'buttonPosition' => $siteSettings['buttonPosition'] ?? $this->buttonPosition,
             'buttonLabel' => $siteSettings['buttonLabel'] ?? $this->buttonLabel,
         ];
@@ -156,9 +147,6 @@ class Settings extends Model
             $this->siteSettings[$siteId] = [];
         }
 
-        if (isset($settings['defaultBehavior'])) {
-            $this->siteSettings[$siteId]['defaultBehavior'] = $settings['defaultBehavior'];
-        }
         if (isset($settings['buttonPosition'])) {
             $this->siteSettings[$siteId]['buttonPosition'] = $settings['buttonPosition'];
         }

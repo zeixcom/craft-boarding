@@ -15,8 +15,9 @@ use yii\db\ActiveQueryInterface;
  * @property string $description Tour description
  * @property string $data Serialized tour data
  * @property bool $enabled Whether the tour is enabled
- * @property bool $translatable Whether the tour is translatable
+ * @property string $propagationMethod How the tour propagates across sites
  * @property string $progressPosition Progress indicator position
+ * @property bool $autoplay Whether the tour should automatically start
  * @property \DateTime $dateCreated Date created
  * @property \DateTime $dateUpdated Date updated
  * @property string $uid UUID
@@ -41,25 +42,5 @@ class TourRecord extends ActiveRecord
     public static function deleteAll($condition = null, $params = []): int
     {
         return parent::deleteAll($condition, $params);
-    }
-    
-    /**
-     * Returns the tour's translations.
-     *
-     * @return ActiveQueryInterface The relational query object.
-     */
-    public function getTranslations(): ActiveQueryInterface
-    {
-        return $this->hasMany(TourI18nRecord::class, ['tourId' => 'id']);
-    }
-    
-    /**
-     * Returns the tour's user group assignments.
-     *
-     * @return ActiveQueryInterface The relational query object.
-     */
-    public function getUserGroups(): ActiveQueryInterface
-    {
-        return $this->hasMany(TourUserGroupRecord::class, ['tourId' => 'id']);
     }
 } 

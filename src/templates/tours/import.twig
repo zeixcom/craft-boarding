@@ -16,11 +16,11 @@
             <div class="heading">
                 <label>{{ "Import File"|t('boarding') }}</label>
                 <div class="instructions">
-                    <p>{{ "Upload a JSON file that was exported from the Boarding plugin."|t('boarding') }}</p>
+                    <p>{{ "Upload a JSON, CSV, or XML file that was exported from the Boarding plugin."|t('boarding') }}</p>
                 </div>
             </div>
             <div class="input">
-                <input type="file" name="importFile" accept=".json" required>
+                <input type="file" name="importFile" accept=".json, .csv, .xml" required>
             </div>
         </div>
 
@@ -48,9 +48,9 @@ $(document).ready(function() {
             return false;
         }
         
-        if (!file.name.endsWith('.json')) {
+        if (!file.name.endsWith('.json') && !file.name.endsWith('.csv') && !file.name.endsWith('.xml')) {
             e.preventDefault();
-            Craft.cp.displayError('{{ "Please select a JSON file."|t('boarding') }}');
+            Craft.cp.displayError('{{ "Please select a JSON, CSV, or XML file."|t('boarding') }}');
             return false;
         }
         

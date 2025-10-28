@@ -38,7 +38,7 @@ class ImportController extends Controller
             }
 
             if (!in_array($uploadedFile->extension, ImportConfig::ALLOWED_EXTENSIONS)) {
-                throw new \Exception(Craft::t('boarding', 'Invalid file type. Please upload a JSON file.'));
+                throw new \Exception(Craft::t('boarding', 'Invalid file type. Please upload a JSON, CSV, or XML file.'));
             }
 
             if ($uploadedFile->size > ImportConfig::MAX_FILE_SIZE_BYTES) {
@@ -49,30 +49,50 @@ class ImportController extends Controller
 
             $mimeType = mime_content_type($uploadedFile->tempName);
             if (!in_array($mimeType, ImportConfig::ALLOWED_MIME_TYPES)) {
-                throw new \Exception(Craft::t('boarding', 'Invalid file MIME type. Expected JSON file but got {type}.', [
+                throw new \Exception(Craft::t('boarding', 'Invalid file MIME type. Got {type}.', [
                     'type' => $mimeType
                 ]));
             }
 
-            $jsonContent = file_get_contents($uploadedFile->tempName);
-            if ($jsonContent === false) {
-                throw new \Exception(Craft::t('boarding', 'Could not read uploaded file'));
-            }
+            // Detect file format and parse accordingly
+            $fileExtension = strtolower($uploadedFile->extension);
+            
+            if ($fileExtension === 'csv') {
+                // Parse CSV file directly to tours array
+                $tours = Boarding::getInstance()->import->parseCsvFile($uploadedFile->tempName);
+                
+                if (empty($tours)) {
+                    throw new \Exception(Craft::t('boarding', 'No valid tours found in CSV file'));
+                }
+            } elseif ($fileExtension === 'xml') {
+                // Parse XML file directly to tours array
+                $tours = Boarding::getInstance()->import->parseXmlFile($uploadedFile->tempName);
+                
+                if (empty($tours)) {
+                    throw new \Exception(Craft::t('boarding', 'No valid tours found in XML file'));
+                }
+            } else {
+                // Parse JSON file
+                $jsonContent = file_get_contents($uploadedFile->tempName);
+                if ($jsonContent === false) {
+                    throw new \Exception(Craft::t('boarding', 'Could not read uploaded file'));
+                }
 
-            $importData = json_decode($jsonContent, true, ImportConfig::MAX_JSON_DEPTH);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                throw new \Exception(Craft::t('boarding', 'Invalid JSON format: {error}', [
-                    'error' => json_last_error_msg()
-                ]));
-            }
+                $importData = json_decode($jsonContent, true, ImportConfig::MAX_JSON_DEPTH);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    throw new \Exception(Craft::t('boarding', 'Invalid JSON format: {error}', [
+                        'error' => json_last_error_msg()
+                    ]));
+                }
 
-            $validationErrors = Boarding::getInstance()->import->validateImportData($importData);
-            if (!empty($validationErrors)) {
-                throw new \Exception(implode(' ', $validationErrors));
-            }
+                $validationErrors = Boarding::getInstance()->import->validateImportData($importData);
+                if (!empty($validationErrors)) {
+                    throw new \Exception(implode(' ', $validationErrors));
+                }
 
-            $exportData = $importData['boardingExport'];
-            $tours = $exportData['tours'] ?? [];
+                $exportData = $importData['boardingExport'];
+                $tours = $exportData['tours'] ?? [];
+            }
 
             $results = Boarding::getInstance()->import->processToursImport($tours);
             $message = Boarding::getInstance()->import->buildDetailedImportMessage($results);

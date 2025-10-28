@@ -537,12 +537,12 @@ class TourRepository
             ])
             ->from(['t' => '{{%boarding_tours}}']);
 
-        if ($options['includeTranslatable'] && DatabaseSchemaHelper::hasTranslatableColumn()) {
-            $query->addSelect(['t.translatable']);
-        }
-
         if (DatabaseSchemaHelper::hasProgressPositionColumn()) {
             $query->addSelect(['t.progressPosition']);
+        }
+
+        if (DatabaseSchemaHelper::hasAutoplayColumn()) {
+            $query->addSelect(['t.autoplay']);
         }
 
         if ($options['includeUserGroups']) {
@@ -660,12 +660,12 @@ class TourRepository
                 'uid' => StringHelper::UUID()
             ];
 
-            if (isset($data['translatable']) && DatabaseSchemaHelper::hasTranslatableColumn()) {
-                $tourData['translatable'] = $data['translatable'];
-            }
-
             if (isset($data['progressPosition']) && DatabaseSchemaHelper::hasProgressPositionColumn()) {
                 $tourData['progressPosition'] = $data['progressPosition'];
+            }
+
+            if (isset($data['autoplay']) && DatabaseSchemaHelper::hasAutoplayColumn()) {
+                $tourData['autoplay'] = $data['autoplay'];
             }
 
             if (isset($data['siteId'])) {
@@ -697,14 +697,14 @@ class TourRepository
                 'dateUpdated' => Db::prepareDateForDb(new \DateTime())
             ];
 
-            $allowedFields = ['name', 'description', 'data', 'enabled', 'translatable', 'progressPosition', 'siteId'];
+            $allowedFields = ['name', 'description', 'data', 'enabled', 'progressPosition', 'autoplay', 'siteId'];
 
             foreach ($allowedFields as $field) {
                 if (array_key_exists($field, $data)) {
-                    if ($field === 'translatable' && !DatabaseSchemaHelper::hasTranslatableColumn()) {
+                    if ($field === 'progressPosition' && !DatabaseSchemaHelper::hasProgressPositionColumn()) {
                         continue;
                     }
-                    if ($field === 'progressPosition' && !DatabaseSchemaHelper::hasProgressPositionColumn()) {
+                    if ($field === 'autoplay' && !DatabaseSchemaHelper::hasAutoplayColumn()) {
                         continue;
                     }
 

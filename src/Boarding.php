@@ -16,14 +16,18 @@ use zeix\boarding\services\ImportService;
 use zeix\boarding\services\ExportService;
 use zeix\boarding\assetbundles\BoardingAsset;
 use zeix\boarding\models\Settings;
+use zeix\boarding\models\Tour;
+use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterTemplateRootsEvent;
 use craft\events\RegisterUserPermissionsEvent;
+use craft\services\Elements;
 use craft\services\UserPermissions;
 use craft\web\View;
 use craft\web\UrlManager;
 use craft\events\RegisterUrlRulesEvent;
 use zeix\boarding\helpers\SiteHelper;
 use yii\base\Event;
+use zeix\boarding\events\TourEvent;
 use craft\base\Plugin;
 use Craft;
 use craft\base\Model;
@@ -35,7 +39,7 @@ use craft\base\Model;
  *
  * @property ToursService $tours
  * @property ImportService $import
- * @property \zeix\boarding\services\ExportService $export
+ * @property ExportService $export
  * @method static Boarding getInstance()
  */
 class Boarding extends Plugin
@@ -63,7 +67,7 @@ class Boarding extends Plugin
     /**
      * @var string
      */
-    public string $schemaVersion = '1.0.2';
+    public string $schemaVersion = '1.0.3';
 
     /**
      * @var bool
@@ -115,10 +119,19 @@ class Boarding extends Plugin
 
         $this->controllerNamespace = 'zeix\\boarding\\controllers';
 
+        // Register element types
         Event::on(
-            \zeix\boarding\models\Tour::class,
-            \zeix\boarding\models\Tour::EVENT_AFTER_SAVE_TOUR,
-            function (\zeix\boarding\events\TourEvent $event) {
+            Elements::class,
+            Elements::EVENT_REGISTER_ELEMENT_TYPES,
+            function (RegisterComponentTypesEvent $event) {
+                $event->types[] = Tour::class;
+            }
+        );
+
+        Event::on(
+            Tour::class,
+            Tour::EVENT_AFTER_SAVE_TOUR,
+            function (TourEvent $event) {
                 Boarding::getInstance()->tours->saveTourUserGroups(
                     $event->tour->id,
                     $event->tour->userGroupIds
@@ -165,7 +178,7 @@ class Boarding extends Plugin
             }
         );
 
-        Craft::$app->onInit(function() {
+        Craft::$app->onInit(function () {
             if (Craft::$app->request->getIsCpRequest()) {
                 /** @var Settings $settings */
                 $settings = $this->getSettings();
@@ -190,7 +203,6 @@ class Boarding extends Plugin
                     $siteSettings = $settings->getAllSettingsForSite($currentSite->id);
                 } else {
                     $siteSettings = [
-                        'defaultBehavior' => $settings->defaultBehavior,
                         'buttonPosition' => $settings->buttonPosition,
                         'buttonLabel' => $settings->buttonLabel,
                         'nextButtonText' => $settings->nextButtonText,
@@ -204,14 +216,12 @@ class Boarding extends Plugin
 
                 $jsSettings = [
                     'buttonPosition' => $siteSettings['buttonPosition'],
-                    'defaultBehavior' => $siteSettings['defaultBehavior'],
                     'buttonLabel' => $siteSettings['buttonLabel'],
                     'nextButtonText' => $siteSettings['nextButtonText'],
                     'doneButtonText' => $siteSettings['doneButtonText'],
                     'backButtonText' => $siteSettings['backButtonText'],
                     'currentSiteId' => $currentSite->id,
                     'currentSiteHandle' => $currentSite->handle,
-                    'isMultiSite' => count($allSites) > 1,
                 ];
 
                 $view->registerJs('
@@ -232,6 +242,14 @@ class Boarding extends Plugin
         $item['url'] = 'boarding/tours';
 
         $subnav = [];
+
+        // Add Import subnav for Pro edition
+        if ($this->is(self::EDITION_PRO)) {
+            $subnav['import'] = [
+                'label' => Craft::t('boarding', 'Import'),
+                'url' => 'boarding/tours/import',
+            ];
+        }
 
         $currentUser = Craft::$app->getUser();
         if ($currentUser && $currentUser->checkPermission('boarding:manageTourSettings')) {

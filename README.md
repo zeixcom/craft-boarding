@@ -14,7 +14,6 @@ Boarding is available in two editions: **Lite** (free) and **Pro** (paid).
 - Create and manage up to **3 tours**
 - Interactive tour steps with customizable content and placement
 - User group-specific tours
-- Track which users have completed each tour
 - Configurable button position (Header, Sidebar, or Hidden)
 - Behavior settings (Auto-start or manual tour initiation)
 - Single site installations
@@ -26,12 +25,11 @@ All Lite features, plus:
 - **Site-specific settings** - Different behavior, button positions, labels, and button texts per site
 - **Internationalization** - Customize button texts (Next, Back, Done) for each site/language
 - **Multi-language tours** - Translate tour content for different sites
-- **Import/Export** - Migrate tours between projects or create backups
-- **Advanced configuration** - Per-site tour visibility and management
+- **Import** - Import tours between projects
 
 ## Installation
 
-You can install this plugin from the Plugin Store or with Composer.
+You can install this plugin from the Plugin Store or with Composer / DDEV.
 
 ### From the Plugin Store
 
@@ -49,6 +47,13 @@ cd /path/to/your-project
 composer require zeix/craft-boarding
 ```
 
+### With DDEV
+
+```bash
+# Go to the project directory
+ddev composer require "zeix/craft-boarding:^1.0.12" -w && ddev craft plugin/install boarding
+```
+
 ## Usage
 
 ### Creating a Tour
@@ -59,6 +64,8 @@ composer require zeix/craft-boarding
 4. Fill in the tour details:
    - **Name**: The name of your tour
    - **Description**: A brief description of what the tour covers
+   - **Progress Indicator Position**: Where the progress indicator should be positioned
+   - **Autoplay**: Whether the tour should autoplay or not
    - **User Group**: The user groups the tour should be available to
    - **Steps**: Add one or more steps to your tour
      - **Title**: Step title
@@ -66,44 +73,51 @@ composer require zeix/craft-boarding
      - **Target Element**: CSS selector for the element to highlight (e.g., `#main-content`, `.btn.submit`, `[data-attribute="value"]`)
      - **Placement**: Where to show the step relative to the target (`top`, `bottom`, `left`, `right`, `center`)
 
-### Multi-Language Tours and Translations
+### Multi-Site Tours and Propagation Methods
 
-The Boarding Pro edition provides comprehensive support for multi-site and multi-language tours, allowing you to create localized experiences for users across different sites.
+The Boarding Pro edition provides comprehensive support for multi-site installations with flexible propagation methods, allowing you to control how tour content is distributed across different sites.
 
-#### Creating Multi-Language Tours
+#### Tour Propagation Methods
 
-For multi-site installations, follow this recommended workflow to create tours that work across different languages:
+When creating or editing a tour, you can choose how it propagates across your sites:
 
-#### Recommended Workflow
-1. **Create the Base Tour**:
-   - Navigate to **Boarding > New Tour**
-   - Fill in the basic tour information in your primary language
-   - Add all the tour steps with complete content
-   - **Important**: Do not enable translations yet - save the tour first
-   - Click **Save**
+**None (Single Site Only)**
+- Tour exists only on the site where it was created
+- No automatic propagation to other sites
+- Ideal for site-specific onboarding content
 
-2. **Enable Translations**:
-   - After saving, edit the tour again
-   - Toggle the "Translatable Tour" Lightswitch
-   - Click **Save** again
+**All Sites**
+- Tour content is identical across all sites
+- Changes to tour content on any site update all sites
+- Perfect for tours that don't require localization
 
-3. **Translate Content**:
-   - Use the site switcher in the top-right corner of the tour edit page
-   - Select the site/language you want to translate to
-   - Translate the tour content:
-     - **Tour Name**: Translate to the target language
-     - **Tour Description**: Translate to the target language
-     - **Step Titles**: Translate each step title
-     - **Step Content**: Translate the step content while keeping the same structure
-     - **Target Elements**: Keep the same CSS selectors (these should remain consistent across sites)
-     - **Placement**: Keep the same positioning
-   - Click **Save**
-   - Repeat for each additional language/site
+**Site Group**
+- Tour propagates to all sites within the same site group
+- Each site can have unique content
+- Useful for region-specific or brand-specific tours
 
-#### Important Translation Notes
+**Language**
+- Tour propagates to all sites with the same language
+- Content remains identical across sites with matching language settings
+- Changes made on any site with the same language update all matching sites
+- Ideal for multi-domain setups with shared language content
 
-- **Keep step count consistent**: All language versions have the same amount of steps. Steps can only be deleted in the Primary Site Tour. When steps are deleted in non primary site, it will automatically take the step from the Primary Language Version.
-- **Test each language**: Preview tours in each language to ensure proper targeting and content flow
+#### Editing Multi-Site Tours
+
+**Content Behavior by Propagation Method**
+
+For **All Sites** and **Language** propagation:
+- Tour name, description, and steps remain synchronized
+- Editing on any applicable site updates all sites
+- No per-site variations allowed
+
+For **Site Group** propagation:
+- Each site can have unique tour content
+- Edit tour independently on each site in the group
+- Changes only affect the current site
+
+For **None** propagation:
+- Tour only exists on the creation site
 
 #### Import/Export with Translations
 
@@ -111,16 +125,11 @@ When importing or exporting tours, the system handles multi-language content:
 
 **Export Includes**:
 - **Multi-site translations**: All language versions of tour content
-- **Site-specific settings**: Localized button texts and configurations
 
 **Import Behavior**:
 - **Translation Preservation**: Multi-site translations are imported and mapped to corresponding sites
 - **Site Mapping**: Map imported sites to sites in your current project
 
-**Best Practices for Multi-Language Import/Export**:
-1. Export all tours from your source project
-2. Set up your destination project with matching site structure (same site handles if possible)
-3. Import tours and test each language version to ensure proper targeting
 
 #### Duplicating Tours
 
@@ -129,48 +138,24 @@ To create a copy of an existing tour:
 1. Navigate to **Boarding** in the Control Panel
 2. Find the tour you want to duplicate in the tours list
 3. Click the **gear icon** next to the tour
-4. Select **"Duplicate Tour"** from the dropdown menu
-5. A new tour will be created with "(Copy)" appended to the name
+4. Select **"Duplicate"** from the dropdown menu
+5. A new tour will be created 
 6. Edit the duplicated tour to customize it for your needs
 
 **Note**: When duplicating tours in multi-site installations, all translations are also duplicated.
 
-### Importing and Exporting Tours
+### Importing
 
-Boarding Pro includes powerful import/export functionality to help you migrate tours between projects, create backups, or share tour templates.
-
-#### Exporting Tours
-
-**Export Single Tour**:
-1. Navigate to **Boarding** in the Control Panel
-2. Find the tour you want to export in the tours list
-3. Click the **gear icon** next to the tour
-4. Select **"Export Tour"** from the dropdown menu
-5. The tour will download as a JSON file containing all tour data, steps, and translations
-
-**Export All Tours**:
-1. Go to **Boarding** in the Control Panel
-2. Click the **"Export All Tours"** button at the top of the tours list
-3. All tours will be exported as a single JSON file
-4. The export includes all tour content, steps, translations, and metadata
-
-#### What's Included in Exports
-Tour exports contain:
-- **Tour metadata**: Name, description, handle, and settings
-- **All tour steps**: Titles, content, target elements, and placement settings
-- **Multi-site translations**: All language versions of tour content (see [Translation section](#multi-language-tours-and-translations) for details)
-- **User group assignments**: Which user groups can access the tour
-- **Tour configuration**: Enable/disable status and other settings
+Boarding Pro includes powerful import functionality to help you migrate tours between projects, create backups, or share tour templates.
 
 #### Importing Tours
 
-**Import Tours**:
 1. Navigate to **Boarding** in the Control Panel
 2. Click **"Import Tours"** button
 3. Choose your import method:
 
-Upload JSON File**
-- Click **"Choose File"** and select your exported JSON file
+Upload File**
+- Click **"Choose File"** and select your exported file
 - Click **"Import Tours"** to begin the process
 - Review the import summary showing which tours will be created/updated
 
@@ -227,16 +212,6 @@ Configure site-specific interface elements through **Boarding > Settings**:
 ##### Menu and Label Customization
 - **Menu Label**: Custom text for the tours button (e.g., "Available Tours", "Tours d'aide", "Hilfe-Touren")
 - **Menu Position**: Configure where tours appear (Header, Sidebar, or Hidden) per site
-
-#### General Settings
-- **Default Behavior**: 
-  - `Auto`: Tours automatically start for new users or users that have not completed the tour yet
-  - `Manual`: Users must manually start tours
-- **Menu Position**:
-  - `Header`: Show tours button in the Control Panel header
-  - `Sidebar`: Show tours button in the Control Panel sidebar
-  - `Hide`: Don't show the tours button
-
 
 ## Support
 

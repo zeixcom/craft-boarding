@@ -19,17 +19,12 @@ class BoardingAsset extends AssetBundle
         ];
 
         $this->js = [
-            'js/utils.js',
-            'js/core.js',
-            'js/ui.js',
-            'js/tour-manager.js',
-            'js/tour-edit.js',
-            'js/init.js',
+            'js/boarding.js',
+            'js/tour-editor.js',
         ];
 
         $this->css = [
             'css/boarding.css',
-            // Use CDN for Shepherd.js CSS (matching JS version)
             'https://cdn.jsdelivr.net/npm/shepherd.js@11.2.0/dist/css/shepherd.css'
         ];
 
@@ -45,7 +40,6 @@ class BoardingAsset extends AssetBundle
      */
     public function registerAssetFiles($view)
     {
-        // Register Shepherd.js from CDN (use older version with UMD build)
         $view->registerJsFile(
             'https://cdn.jsdelivr.net/npm/shepherd.js@11.2.0/dist/js/shepherd.min.js',
             [
@@ -53,7 +47,7 @@ class BoardingAsset extends AssetBundle
             ]
         );
 
-        // Register the rest of the assets normally
+
         parent::registerAssetFiles($view);
     }
 }
