@@ -54,12 +54,39 @@ class m251028_000000_fix_orphaned_tours extends Migration
      */
     private function findOrphanedTours(): array
     {
-        return (new Query())
+        // First, let's see all tours
+        $allTours = (new Query())
+            ->select(['bt.id', 'bt.name'])
+            ->from(['bt' => '{{%boarding_tours}}'])
+            ->all();
+
+        echo "Total tours in database: " . count($allTours) . "\n";
+
+        // Check which ones have element entries
+        $toursWithElements = (new Query())
+            ->select(['bt.id', 'bt.name', 'e.id as element_id'])
+            ->from(['bt' => '{{%boarding_tours}}'])
+            ->innerJoin(['e' => Table::ELEMENTS], '[[e.id]] = [[bt.id]]')
+            ->all();
+
+        echo "Tours with element entries: " . count($toursWithElements) . "\n";
+
+        // Find orphaned tours
+        $orphanedTours = (new Query())
             ->select(['bt.*'])
             ->from(['bt' => '{{%boarding_tours}}'])
             ->leftJoin(['e' => Table::ELEMENTS], '[[e.id]] = [[bt.id]]')
             ->where(['e.id' => null])
             ->all();
+
+        if (!empty($orphanedTours)) {
+            echo "Orphaned tours found:\n";
+            foreach ($orphanedTours as $tour) {
+                echo "  - ID: {$tour['id']}, Name: {$tour['name']}\n";
+            }
+        }
+
+        return $orphanedTours;
     }
 
     /**
