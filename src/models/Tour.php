@@ -241,16 +241,7 @@ class Tour extends Element
 
         if ($this->hasErrors()) {
             $errors = $this->getErrors();
-            // Log to file
-            Craft::error('Tour validation errors: ' . print_r([
-                'errors' => $errors,
-                'tourId' => $this->tourId,
-                'title' => $this->title,
-                'progressPosition' => $this->progressPosition,
-                'enabled' => $this->enabled,
-            ], true), 'boarding');
 
-            // Also log to console for web requests
             if (Craft::$app->getRequest()->getIsCpRequest()) {
                 Craft::$app->getSession()->setNotice('Validation errors: ' . json_encode($errors));
             }

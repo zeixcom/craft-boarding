@@ -89,7 +89,6 @@ class ToursController extends Controller
             $tours = Boarding::getInstance()->tours->getAllTours();
             return $this->asJson(['success' => true, 'tours' => $tours]);
         } catch (\Exception $e) {
-            Craft::error('Failed to get all tours: ' . $e->getMessage(), 'boarding');
             return $this->asJson([
                 'success' => false,
                 'error' => Craft::t('boarding', 'Failed to load tours. Please try again.')
