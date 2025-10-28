@@ -61,8 +61,12 @@ class ToursService extends Component
         try {
             $columns = $this->getExistingTourColumns();
             $currentSite = SiteHelper::getSiteForRequestAuto($this->request);
+
+            // In admin, show all tours across all sites
+            // Use '*' to get tours from any site they're enabled on
             $tourElements = Tour::find()
-                ->siteId($currentSite->id)
+                ->siteId('*')
+                ->unique()
                 ->status(null)
                 ->orderBy(['dateCreated' => SORT_DESC])
                 ->all();
