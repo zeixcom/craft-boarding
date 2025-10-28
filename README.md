@@ -14,7 +14,6 @@ Boarding is available in two editions: **Lite** (free) and **Pro** (paid).
 - Create and manage up to **3 tours**
 - Interactive tour steps with customizable content and placement
 - User group-specific tours
-- Track which users have completed each tour
 - Configurable button position (Header, Sidebar, or Hidden)
 - Behavior settings (Auto-start or manual tour initiation)
 - Single site installations
@@ -26,12 +25,11 @@ All Lite features, plus:
 - **Site-specific settings** - Different behavior, button positions, labels, and button texts per site
 - **Internationalization** - Customize button texts (Next, Back, Done) for each site/language
 - **Multi-language tours** - Translate tour content for different sites
-- **Import/Export** - Migrate tours between projects or create backups
-- **Advanced configuration** - Per-site tour visibility and management
+- **Import** - Import tours between projects
 
 ## Installation
 
-You can install this plugin from the Plugin Store or with Composer.
+You can install this plugin from the Plugin Store or with Composer / DDEV.
 
 ### From the Plugin Store
 
@@ -49,6 +47,13 @@ cd /path/to/your-project
 composer require zeix/craft-boarding
 ```
 
+### With DDEV
+
+```bash
+# Go to the project directory
+ddev composer require "zeix/craft-boarding:^1.0.12" -w && ddev craft plugin/install boarding
+```
+
 ## Usage
 
 ### Creating a Tour
@@ -59,6 +64,8 @@ composer require zeix/craft-boarding
 4. Fill in the tour details:
    - **Name**: The name of your tour
    - **Description**: A brief description of what the tour covers
+   - **Progress Indicator Position**: Where the progress indicator should be positioned
+   - **Autoplay**: Whether the tour should autoplay or not
    - **User Group**: The user groups the tour should be available to
    - **Steps**: Add one or more steps to your tour
      - **Title**: Step title
@@ -83,35 +90,19 @@ When creating or editing a tour, you can choose how it propagates across your si
 - Tour content is identical across all sites
 - Changes to tour content on any site update all sites
 - Perfect for tours that don't require localization
-- Example: Feature introduction tours that apply universally
 
 **Site Group**
 - Tour propagates to all sites within the same site group
 - Each site can have unique content
 - Useful for region-specific or brand-specific tours
-- Example: Tours for different brands sharing the same Craft installation
 
 **Language**
 - Tour propagates to all sites with the same language
 - Content remains identical across sites with matching language settings
 - Changes made on any site with the same language update all matching sites
 - Ideal for multi-domain setups with shared language content
-- Example: English tours shared across example.com and example.co.uk
-
-#### Creating Tours with Propagation
-
-1. Navigate to **Boarding > New Tour**
-2. Fill in the tour information (name, description, steps)
-3. Select the **Propagation Method** from the dropdown
-4. Click **Save**
-5. The tour will automatically be available on the appropriate sites based on your chosen propagation method
 
 #### Editing Multi-Site Tours
-
-**Site Selector**
-- When editing a tour, the site selector in the top-right corner shows only sites where the tour exists
-- Switch between sites to edit site-specific content (for Site Group propagation)
-- Changes to shared content (All Sites, Language) automatically update all applicable sites
 
 **Content Behavior by Propagation Method**
 
@@ -127,20 +118,6 @@ For **Site Group** propagation:
 
 For **None** propagation:
 - Tour only exists on the creation site
-- No site selector appears (single site only)
-
-#### Best Practices
-
-**Choosing the Right Propagation Method**
-- Use **None** for site-specific tutorials (e.g., "Managing Your Inventory" for an e-commerce site)
-- Use **All Sites** for universal features (e.g., "How to Create a Blog Post")
-- Use **Site Group** for brand-specific content across related sites
-- Use **Language** for consistent content across sites with the same language
-
-**Testing Multi-Site Tours**
-- Test tours on each applicable site to ensure proper element targeting
-- Verify that CSS selectors work across all sites
-- Confirm that tours appear for the correct user groups
 
 #### Import/Export with Translations
 
@@ -148,16 +125,11 @@ When importing or exporting tours, the system handles multi-language content:
 
 **Export Includes**:
 - **Multi-site translations**: All language versions of tour content
-- **Site-specific settings**: Localized button texts and configurations
 
 **Import Behavior**:
 - **Translation Preservation**: Multi-site translations are imported and mapped to corresponding sites
 - **Site Mapping**: Map imported sites to sites in your current project
 
-**Best Practices for Multi-Language Import/Export**:
-1. Export all tours from your source project
-2. Set up your destination project with matching site structure (same site handles if possible)
-3. Import tours and test each language version to ensure proper targeting
 
 #### Duplicating Tours
 
@@ -166,48 +138,24 @@ To create a copy of an existing tour:
 1. Navigate to **Boarding** in the Control Panel
 2. Find the tour you want to duplicate in the tours list
 3. Click the **gear icon** next to the tour
-4. Select **"Duplicate Tour"** from the dropdown menu
-5. A new tour will be created with "(Copy)" appended to the name
+4. Select **"Duplicate"** from the dropdown menu
+5. A new tour will be created 
 6. Edit the duplicated tour to customize it for your needs
 
 **Note**: When duplicating tours in multi-site installations, all translations are also duplicated.
 
-### Importing and Exporting Tours
+### Importing
 
-Boarding Pro includes powerful import/export functionality to help you migrate tours between projects, create backups, or share tour templates.
-
-#### Exporting Tours
-
-**Export Single Tour**:
-1. Navigate to **Boarding** in the Control Panel
-2. Find the tour you want to export in the tours list
-3. Click the **gear icon** next to the tour
-4. Select **"Export Tour"** from the dropdown menu
-5. The tour will download as a JSON file containing all tour data, steps, and translations
-
-**Export All Tours**:
-1. Go to **Boarding** in the Control Panel
-2. Click the **"Export All Tours"** button at the top of the tours list
-3. All tours will be exported as a single JSON file
-4. The export includes all tour content, steps, translations, and metadata
-
-#### What's Included in Exports
-Tour exports contain:
-- **Tour metadata**: Name, description, handle, and settings
-- **All tour steps**: Titles, content, target elements, and placement settings
-- **Multi-site translations**: All language versions of tour content (see [Translation section](#multi-language-tours-and-translations) for details)
-- **User group assignments**: Which user groups can access the tour
-- **Tour configuration**: Enable/disable status and other settings
+Boarding Pro includes powerful import functionality to help you migrate tours between projects, create backups, or share tour templates.
 
 #### Importing Tours
 
-**Import Tours**:
 1. Navigate to **Boarding** in the Control Panel
 2. Click **"Import Tours"** button
 3. Choose your import method:
 
-Upload JSON File**
-- Click **"Choose File"** and select your exported JSON file
+Upload File**
+- Click **"Choose File"** and select your exported file
 - Click **"Import Tours"** to begin the process
 - Review the import summary showing which tours will be created/updated
 
@@ -264,16 +212,6 @@ Configure site-specific interface elements through **Boarding > Settings**:
 ##### Menu and Label Customization
 - **Menu Label**: Custom text for the tours button (e.g., "Available Tours", "Tours d'aide", "Hilfe-Touren")
 - **Menu Position**: Configure where tours appear (Header, Sidebar, or Hidden) per site
-
-#### General Settings
-- **Default Behavior**: 
-  - `Auto`: Tours automatically start for new users or users that have not completed the tour yet
-  - `Manual`: Users must manually start tours
-- **Menu Position**:
-  - `Header`: Show tours button in the Control Panel header
-  - `Sidebar`: Show tours button in the Control Panel sidebar
-  - `Hide`: Don't show the tours button
-
 
 ## Support
 
