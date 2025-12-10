@@ -13,7 +13,6 @@ namespace zeix\boarding;
 
 use zeix\boarding\services\ToursService;
 use zeix\boarding\services\ImportService;
-use zeix\boarding\services\ExportService;
 use zeix\boarding\assetbundles\BoardingAsset;
 use zeix\boarding\models\Settings;
 use zeix\boarding\models\Tour;
@@ -39,7 +38,6 @@ use craft\base\Model;
  *
  * @property ToursService $tours
  * @property ImportService $import
- * @property ExportService $export
  * @method static Boarding getInstance()
  */
 class Boarding extends Plugin
@@ -114,7 +112,6 @@ class Boarding extends Plugin
         $this->setComponents([
             'tours' => ToursService::class,
             'import' => ImportService::class,
-            'export' => ExportService::class,
         ]);
 
         $this->controllerNamespace = 'zeix\\boarding\\controllers';
@@ -170,8 +167,6 @@ class Boarding extends Plugin
                     'boarding/settings' => 'boarding/settings/index',
                     'boarding/tours/import' => 'boarding/import/import',
                     'boarding/tours/import-tours' => 'boarding/import/import-tours',
-                    'boarding/tours/export-tour' => 'boarding/export/export-tour',
-                    'boarding/tours/export-all-tours' => 'boarding/export/export-all-tours'
                 ];
 
                 $event->rules = array_merge($event->rules, $rules);

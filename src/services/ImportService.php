@@ -112,7 +112,7 @@ class ImportService extends Component
                             $results['imported']++;
                         }
                     } else {
-                        $errors = $tour->getErrors();
+                        $errors = $tour->errors;
                         $errorMsg = !empty($errors) ? json_encode($errors) : 'Unknown error';
                         $results['errors'][] = Craft::t('boarding', 'Tour #{index}: Failed to save "{name}": {error}', [
                             'index' => $index + 1,
