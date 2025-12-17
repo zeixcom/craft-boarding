@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.4] - 2025-12-17
+
+### Added
+
+- Add config-only CSS variable overrides for tour theming
+- Adds new migration file
+
+### Changed
+
+- Update ToursService to retrieve all tours across sites by modifying siteId query to use '*' and ensuring unique results.
+- Enhance orphaned tour detection in migration by adding detailed logging for total tours and tours with element entries, improving visibility into the migration process.
+- Refactor orphaned tour handling in migration: replace element creation with a comprehensive fixOrphanedTour method that restores related data and ensures proper recreation of tours with new IDs.
+
+### Removed
+
+- Remove ExportService and related export functionality, update ImportConfig and ImportController to reflect changes, and adjust Boarding class to remove export references.
+
 ## [1.3.0] - 2025-12-10
 
 ### Added
