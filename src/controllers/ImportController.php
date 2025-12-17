@@ -18,7 +18,7 @@ class ImportController extends Controller
     public function actionImport(): Response
     {
         $this->requirePermission('boarding:createtours');
-        $this->requireProEdition('Import/Export features');
+        $this->requireProEdition('Import features');
 
         return $this->renderTemplate('boarding/tours/import', [
             'title' => Craft::t('boarding', 'Import Tours')
@@ -29,7 +29,7 @@ class ImportController extends Controller
     {
         $this->requirePostRequest();
         $this->requirePermission('boarding:createtours');
-        $this->requireProEdition('Import/Export features');
+        $this->requireProEdition('Import features');
 
         try {
             $uploadedFile = \yii\web\UploadedFile::getInstanceByName('importFile');

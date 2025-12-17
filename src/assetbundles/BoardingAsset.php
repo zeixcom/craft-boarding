@@ -24,8 +24,9 @@ class BoardingAsset extends AssetBundle
         ];
 
         $this->css = [
+            // Load Shepherd first so our plugin CSS can override it
+            'https://cdn.jsdelivr.net/npm/shepherd.js@11.2.0/dist/css/shepherd.css',
             'css/boarding.css',
-            'https://cdn.jsdelivr.net/npm/shepherd.js@11.2.0/dist/css/shepherd.css'
         ];
 
         $this->publishOptions = [

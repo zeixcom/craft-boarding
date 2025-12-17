@@ -3,7 +3,7 @@
 namespace zeix\boarding\config;
 
 /**
- * Configuration constants for import/export functionality
+ * Configuration constants for import functionality
  */
 class ImportConfig
 {
