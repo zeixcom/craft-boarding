@@ -1,32 +1,86 @@
 /**
  * Boarding module for Craft CMS
  * Scoped to prevent affecting other parts of the control panel
- */
+*/
 
-/* :root {
-    --boarding-primary-color: #0b69a3;
-    --boarding-secondary-color: #6c757d;
-    --boarding-success-color: #27ae60;
-    --boarding-warning-color: #f39c12;
-    --boarding-danger-color: #e74c3c;
-    --boarding-info-color: #17a2b8;
-    --boarding-light-color: #f8f9fa;
-    --boarding-dark-color: #343a40;
+/* ------------------------------------------------------------
+   Shepherd tour theming (driven by CSS variables)
+   ------------------------------------------------------------ */
+
+:root {
+    /* Shared */
+    --boarding-spacing-sm: 10px;
+
+    /* Plugin UI */
+    --boarding-background-color: #fff;
     --boarding-border-color: #e3e5e8;
-    --boarding-text-color: #596673;
+    --boarding-text-color: #333;
     --boarding-text-color-light: #606d7b;
-    --boarding-background-color: #ffffff;
-    --boarding-background-color-secondary: #f8f9fa;
-    --boarding-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    --boarding-border-radius: 4px;
-    --boarding-spacing-xs: 5px;
-    --boarding-spacing-md: 15px;
-    --boarding-spacing-lg: 20px;
-    --boarding-spacing-xl: 30px;
-    --boarding-button-padding: 8px 16px;
-    --boarding-button-border-radius: 4px;
-    --boarding-menu-max-width: 400px;
-} */
+    --boarding-tour-max-width: 400px;
+
+    /* Shepherd UI */
+    --boarding-shepherd-bg: #ffffff;
+    --boarding-shepherd-text: #29323d;
+    --boarding-shepherd-muted: #606d7b;
+    --boarding-shepherd-border: #e3e5e8;
+    --boarding-shepherd-radius: 8px;
+    --boarding-shepherd-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+    --boarding-shepherd-primary-bg: #0d78f2;
+    --boarding-shepherd-primary-text: #ffffff;
+    --boarding-shepherd-secondary-bg: #eef2f7;
+    --boarding-shepherd-secondary-text: #29323d;
+}
+
+.shepherd-element {
+    max-width: var(--boarding-tour-max-width, 400px);
+    border-radius: var(--boarding-shepherd-radius, 8px);
+    box-shadow: var(--boarding-shepherd-shadow, 0 8px 24px rgba(0, 0, 0, 0.18));
+    border: 1px solid var(--boarding-shepherd-border, #e3e5e8);
+}
+
+.shepherd-content,
+.shepherd-text {
+    color: var(--boarding-shepherd-text, #29323d);
+}
+
+.shepherd-text {
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+.shepherd-header {
+    background: transparent;
+    border-bottom: 1px solid var(--boarding-shepherd-border, #e3e5e8);
+}
+
+.shepherd-title {
+    color: var(--boarding-shepherd-text, #29323d);
+    font-size: 16px;
+}
+
+.shepherd-cancel-icon {
+    color: var(--boarding-shepherd-muted, #606d7b);
+}
+
+.shepherd-footer {
+    border-top: 1px solid var(--boarding-shepherd-border, #e3e5e8);
+}
+
+.shepherd-button {
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-weight: 600;
+}
+
+.shepherd-button.shepherd-button-primary {
+    background: var(--boarding-shepherd-primary-bg, #0d78f2);
+    color: var(--boarding-shepherd-primary-text, #fff);
+}
+
+.shepherd-button.shepherd-button-secondary {
+    background: var(--boarding-shepherd-secondary-bg, #eef2f7);
+    color: var(--boarding-shepherd-secondary-text, #29323d);
+}
 
 .boarding-plugin  .field-layout .field-layout-column {
     width: 100%;

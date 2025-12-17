@@ -30,6 +30,7 @@ use zeix\boarding\events\TourEvent;
 use craft\base\Plugin;
 use Craft;
 use craft\base\Model;
+use craft\helpers\Json;
 
 /**
  * Boarding plugin for Craft CMS
@@ -179,6 +180,13 @@ class Boarding extends Plugin
                 $settings = $this->getSettings();
                 $allSites = Craft::$app->getSites()->getAllSites();
 
+                // Config-only CSS variable overrides from config/boarding.php
+
+                $configOverrides = Craft::$app->config->getConfigFromFile('boarding');
+                if (!is_array($configOverrides)) {
+                    $configOverrides = [];
+                }
+
                 if (Craft::$app->request instanceof \craft\console\Request) {
                     $currentSite = Craft::$app->getSites()->getPrimarySite();
                 } else {
@@ -209,6 +217,36 @@ class Boarding extends Plugin
                 $view = Craft::$app->getView();
                 $view->registerAssetBundle(BoardingAsset::class);
 
+                $configCssVars = $configOverrides['cssVariables'] ?? [];
+                $configSiteCssVars = $configOverrides['siteCssVariables'] ?? [];
+                if (!is_array($configCssVars)) {
+                    $configCssVars = [];
+                }
+                if (!is_array($configSiteCssVars)) {
+                    $configSiteCssVars = [];
+                }
+
+                $siteHandle = $currentSite->handle;
+                $perSiteVars = $configSiteCssVars[$siteHandle] ?? [];
+                if (!is_array($perSiteVars)) {
+                    $perSiteVars = [];
+                }
+
+                $cssVars = array_merge($configCssVars, $perSiteVars);
+                $cssVars = $this->_normalizeCssVariables($cssVars);
+
+                $cssOverride = $this->_buildCssOverride($cssVars);
+                if ($cssOverride !== null) {
+                    $view->registerCss($cssOverride, [], 'boarding-css-overrides');
+
+                    if (Craft::$app->getConfig()->getGeneral()->devMode) {
+                        Craft::info('Boarding plugin: Registered CSS variable overrides for site ' . $currentSite->handle . ' (vars=' . count($cssVars) . ')', 'boarding');
+                        Craft::info('Boarding plugin: CSS variables: ' . Json::encode($cssVars), 'boarding');
+                    }
+                } elseif (Craft::$app->getConfig()->getGeneral()->devMode) {
+                    Craft::info('Boarding plugin: No CSS variable overrides configured for site ' . $currentSite->handle, 'boarding');
+                }
+
                 $jsSettings = [
                     'buttonPosition' => $siteSettings['buttonPosition'],
                     'buttonLabel' => $siteSettings['buttonLabel'],
@@ -224,6 +262,70 @@ class Boarding extends Plugin
                     ', View::POS_BEGIN);
             }
         });
+    }
+
+    /**
+     * Normalize + sanitize CSS variables map.
+     *
+     * @param array $vars Map of CSS variable names to values.
+     * @return array Sanitized map with keys in `--var-name` form.
+     */
+    private function _normalizeCssVariables(array $vars): array
+    {
+        $result = [];
+
+        foreach ($vars as $name => $value) {
+            if (!is_string($name)) {
+                continue;
+            }
+            if (!is_string($value) && !is_numeric($value)) {
+                continue;
+            }
+
+            $name = trim($name);
+            if ($name === '') {
+                continue;
+            }
+
+            // Allow keys without leading `--` (we’ll add it)
+            if (!str_starts_with($name, '--')) {
+                $name = '--' . ltrim($name, '-');
+            }
+
+            // Strict var name allowlist
+            if (!preg_match('/^--[a-zA-Z0-9_-]+$/', $name)) {
+                continue;
+            }
+
+            $value = trim((string)$value);
+            if ($value === '') {
+                continue;
+            }
+
+            // Avoid injecting HTML / style tag breaks
+            $value = str_ireplace('</style', '', $value);
+            $value = str_replace(['<', '>'], '', $value);
+
+            // Prevent breaking out of the declaration
+            $value = str_replace(['{', '}', ';'], '', $value);
+
+            $result[$name] = $value;
+        }
+
+        return $result;
+    }
+
+    private function _buildCssOverride(array $cssVars): ?string
+    {
+        if (!empty($cssVars)) {
+            $declarations = [];
+            foreach ($cssVars as $name => $value) {
+                $declarations[] = $name . ': ' . $value . ';';
+            }
+            return ':root{' . implode('', $declarations) . '}';
+        }
+
+        return null;
     }
 
     /**

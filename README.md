@@ -213,6 +213,32 @@ Configure site-specific interface elements through **Boarding > Settings**:
 - **Menu Label**: Custom text for the tours button (e.g., "Available Tours", "Tours d'aide", "Hilfe-Touren")
 - **Menu Position**: Configure where tours appear (Header, Sidebar, or Hidden) per site
 
+### Styling (CSS variables)
+
+Boarding tours are powered by [Shepherd.js](https://www.shepherdjs.dev/). You can customize the look & feel by overriding CSS variables **via config only** (there is no CP UI for this).
+
+Create `config/boarding.php` in your Craft project:
+
+```php
+<?php
+return [
+  // Global overrides (applied for all sites)
+  'cssVariables' => [
+    '--boarding-shepherd-primary-bg' => '#ff4d4f',
+    '--boarding-tour-max-width' => '520px',
+  ],
+
+  // Optional per-site overrides (keyed by site handle)
+  'siteCssVariables' => [
+    'en' => [
+      '--boarding-shepherd-primary-bg' => '#0d78f2',
+    ],
+  ],
+];
+```
+
+**Verification (devMode)**: when `devMode` is on, Boarding will log which variables were applied per site to `storage/logs/`.
+
 ## Support
 
 If you have any issues or feature requests, please create an issue on GitHub.
