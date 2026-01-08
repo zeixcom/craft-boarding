@@ -7,7 +7,7 @@ use yii\db\ActiveQueryInterface;
 
 /**
  * TourUserGroupRecord represents a tour user group assignment in the database.
- * 
+ *
  * @property int $id ID
  * @property int $tourId Tour ID
  * @property int $userGroupId User group ID
@@ -56,4 +56,4 @@ class TourUserGroupRecord extends ActiveRecord
     {
         return $this->hasOne(\craft\records\UserGroup::class, ['id' => 'userGroupId']);
     }
-} 
+}

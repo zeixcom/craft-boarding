@@ -3,11 +3,10 @@
 namespace zeix\boarding\records;
 
 use craft\db\ActiveRecord;
-use yii\db\ActiveQueryInterface;
 
 /**
  * TourRecord represents a tour record in the database.
- * 
+ *
  * @property int $id ID
  * @property int $siteId Site ID
  * @property string $tourId Tour ID
@@ -43,4 +42,4 @@ class TourRecord extends ActiveRecord
     {
         return parent::deleteAll($condition, $params);
     }
-} 
+}

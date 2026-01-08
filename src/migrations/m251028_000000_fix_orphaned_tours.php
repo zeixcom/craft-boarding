@@ -2,7 +2,6 @@
 
 namespace zeix\boarding\migrations;
 
-use Craft;
 use craft\db\Migration;
 use craft\db\Query;
 use craft\db\Table;

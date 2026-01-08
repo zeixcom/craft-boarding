@@ -21,7 +21,7 @@ class ImportController extends Controller
         $this->requireProEdition('Import features');
 
         return $this->renderTemplate('boarding/tours/import', [
-            'title' => Craft::t('boarding', 'Import Tours')
+            'title' => Craft::t('boarding', 'Import Tours'),
         ]);
     }
 
@@ -43,14 +43,14 @@ class ImportController extends Controller
 
             if ($uploadedFile->size > ImportConfig::MAX_FILE_SIZE_BYTES) {
                 throw new \Exception(Craft::t('boarding', 'File too large. Maximum size is {size}MB.', [
-                    'size' => ImportConfig::MAX_FILE_SIZE_MB
+                    'size' => ImportConfig::MAX_FILE_SIZE_MB,
                 ]));
             }
 
             $mimeType = mime_content_type($uploadedFile->tempName);
             if (!in_array($mimeType, ImportConfig::ALLOWED_MIME_TYPES)) {
                 throw new \Exception(Craft::t('boarding', 'Invalid file MIME type. Got {type}.', [
-                    'type' => $mimeType
+                    'type' => $mimeType,
                 ]));
             }
 
@@ -81,7 +81,7 @@ class ImportController extends Controller
                 $importData = json_decode($jsonContent, true, ImportConfig::MAX_JSON_DEPTH);
                 if (json_last_error() !== JSON_ERROR_NONE) {
                     throw new \Exception(Craft::t('boarding', 'Invalid JSON format: {error}', [
-                        'error' => json_last_error_msg()
+                        'error' => json_last_error_msg(),
                     ]));
                 }
 
@@ -100,19 +100,19 @@ class ImportController extends Controller
                 return $this->asJson([
                     'success' => true,
                     'results' => $results,
-                    'message' => $message
+                    'message' => $message,
                 ]);
             }
             Craft::$app->getSession()->setNotice($message);
             return $this->redirect('boarding/tours');
         } catch (\Exception $e) {
             $errorMessage = Craft::t('boarding', 'Import failed: {error}', [
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
             if ($this->request->getAcceptsJson()) {
                 return $this->asJson([
                     'success' => false,
-                    'error' => $errorMessage
+                    'error' => $errorMessage,
                 ]);
             }
             Craft::$app->getSession()->setError($errorMessage);

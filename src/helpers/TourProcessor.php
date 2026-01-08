@@ -4,7 +4,7 @@ namespace zeix\boarding\helpers;
 
 /**
  * TourProcessor - Unified tour data processing pipeline
- * 
+ *
  * This class provides a consistent approach to processing tour data,
  * eliminating duplication between different tour processing contexts.
  */
@@ -12,7 +12,7 @@ class TourProcessor
 {
     /**
      * Process a single tour with all pro transformations
-     * 
+     *
      * @param array $tour Raw tour data
      * @param array $options Processing options
      * @param array $loaders Callable loaders for external data
@@ -91,7 +91,7 @@ class TourProcessor
 
     /**
      * Process multiple tours using the unified pipeline
-     * 
+     *
      * @param array $tours Array of tour data
      * @param array $options Processing options
      * @param array $loaders Callable loaders for external data
@@ -110,7 +110,7 @@ class TourProcessor
 
     /**
      * Process multiple tours with bulk loading for optimal performance
-     * 
+     *
      * @param array $tours Array of tour data
      * @param array $options Processing options
      * @param array $bulkOptions Bulk loading options
@@ -141,7 +141,7 @@ class TourProcessor
 
     /**
      * Process user groups from raw data
-     * 
+     *
      * @param array $tour Tour data
      * @param array $loaders Loaders array
      * @return array Tour with processed user groups
@@ -162,7 +162,7 @@ class TourProcessor
 
     /**
      * Load completion data
-     * 
+     *
      * @param array $tour Tour data
      * @param array $loaders Loaders array
      * @return array Tour with completion data
@@ -180,7 +180,7 @@ class TourProcessor
 
     /**
      * Clean up unwanted fields
-     * 
+     *
      * @param array $tour Tour data
      * @return array Cleaned tour data
      */
@@ -197,7 +197,7 @@ class TourProcessor
 
     /**
      * Process JSON data field and merge into tour with caching
-     * 
+     *
      * @param array $tour Tour data
      * @return array Tour with JSON data processed
      */
@@ -208,7 +208,7 @@ class TourProcessor
 
     /**
      * Extract steps from data field with caching
-     * 
+     *
      * @param array $tour Tour data
      * @return array Tour with steps extracted
      */
@@ -224,7 +224,7 @@ class TourProcessor
 
     /**
      * Load translations using provided loader
-     * 
+     *
      * @param array $tour Tour data
      * @param array $loaders Loaders array
      * @return array Tour with translations loaded
@@ -240,7 +240,7 @@ class TourProcessor
 
     /**
      * Apply translations for a specific site
-     * 
+     *
      * @param array $tour Tour data
      * @param int $siteId Site ID
      * @param array $loaders Loaders array
@@ -257,7 +257,7 @@ class TourProcessor
 
     /**
      * Process progress information for user-specific tours
-     * 
+     *
      * @param array $tour Tour data
      * @return array Tour with progress processed
      */
@@ -282,7 +282,7 @@ class TourProcessor
 
     /**
      * Create a loader configuration for admin tour processing
-     * 
+     *
      * @param callable $completionsLoader Function to load completions
      * @param callable $translationsLoader Function to load translations
      * @return array Loader configuration
@@ -297,7 +297,7 @@ class TourProcessor
 
     /**
      * Create a loader configuration for user tour processing
-     * 
+     *
      * @param callable $userGroupsLoader Function to load user groups
      * @param callable $completionsLoader Function to load completions
      * @param callable $translationsLoader Function to load translations
@@ -308,7 +308,7 @@ class TourProcessor
         callable $userGroupsLoader,
         callable $completionsLoader,
         callable $translationsLoader,
-        callable $applyTranslationsLoader
+        callable $applyTranslationsLoader,
     ): array {
         return [
             'userGroups' => $userGroupsLoader,
@@ -320,7 +320,7 @@ class TourProcessor
 
     /**
      * Get processing options for admin context
-     * 
+     *
      * @param array $columns Column availability information
      * @return array Processing options
      */
@@ -340,7 +340,7 @@ class TourProcessor
 
     /**
      * Get processing options for user context
-     * 
+     *
      * @param int $siteId Current site ID
      * @return array Processing options
      */

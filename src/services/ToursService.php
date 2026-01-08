@@ -4,21 +4,21 @@ namespace zeix\boarding\services;
 
 use Craft;
 use craft\base\Component;
-use craft\helpers\StringHelper;
 use craft\helpers\Db;
+use craft\helpers\StringHelper;
 use yii\web\NotFoundHttpException;
-use zeix\boarding\repositories\TourRepository;
-use zeix\boarding\helpers\TranslationProcessor;
+use zeix\boarding\Boarding;
+use zeix\boarding\exceptions\TourException;
 use zeix\boarding\helpers\BulkTourLoader;
 use zeix\boarding\helpers\DatabaseSchemaHelper;
-use zeix\boarding\helpers\TourProcessor;
 use zeix\boarding\helpers\JsonCache;
-use zeix\boarding\helpers\UserGroupProcessor;
 use zeix\boarding\helpers\SiteHelper;
-use zeix\boarding\utils\Logger;
-use zeix\boarding\exceptions\TourException;
-use zeix\boarding\Boarding;
+use zeix\boarding\helpers\TourProcessor;
+use zeix\boarding\helpers\TranslationProcessor;
+use zeix\boarding\helpers\UserGroupProcessor;
 use zeix\boarding\models\Tour;
+use zeix\boarding\repositories\TourRepository;
+use zeix\boarding\utils\Logger;
 
 /**
  * ToursService - Unified service for all tour operations
@@ -123,7 +123,7 @@ class ToursService extends Component
             $tour['completedBy'] = $this->repository->getCompletions($tourId);
             $tour['steps'] = JsonCache::decodeTourSteps($tour);
 
-            $tour = TranslationProcessor::processTranslatableTour($tour, function ($tourId) {
+            $tour = TranslationProcessor::processTranslatableTour($tour, function($tourId) {
                 return $this->repository->getTranslations($tourId);
             });
 
@@ -195,9 +195,9 @@ class ToursService extends Component
             JsonCache::preWarmCache($tours);
             $options = TourProcessor::getUserProcessingOptions($currentSite->id);
             $options['additionalLoaders'] = [
-                'applyTranslations' => function ($tour, $siteId) {
+                'applyTranslations' => function($tour, $siteId) {
                     return $this->applyTourTranslations($tour, $siteId);
-                }
+                },
             ];
 
             return TourProcessor::processToursWithBulkLoading($tours, $options, [
@@ -426,7 +426,7 @@ class ToursService extends Component
                 'data' => json_encode($jsonData),
                 'enabled' => $originalTour['enabled'],
                 'dateCreated' => Db::prepareDateForDb(new \DateTime()),
-                'dateUpdated' => Db::prepareDateForDb(new \DateTime())
+                'dateUpdated' => Db::prepareDateForDb(new \DateTime()),
             ];
 
             if (isset($originalTour['siteId'])) {
@@ -616,7 +616,7 @@ class ToursService extends Component
                         'enabled' => $enabled,
                         'dateCreated' => Db::prepareDateForDb(new \DateTime()),
                         'dateUpdated' => Db::prepareDateForDb(new \DateTime()),
-                        'uid' => StringHelper::UUID()
+                        'uid' => StringHelper::UUID(),
                     ])
                     ->execute();
                 return true;
@@ -758,7 +758,7 @@ class ToursService extends Component
                 'isProEdition' => Boarding::getInstance()->is(Boarding::EDITION_PRO),
                 'tourCount' => 0,
                 'tourLimit' => Boarding::LITE_TOUR_LIMIT,
-                'tourLimitReached' => false
+                'tourLimitReached' => false,
             ];
         }
 
@@ -787,7 +787,7 @@ class ToursService extends Component
             'isProEdition' => $isProEdition,
             'tourCount' => $tourCount,
             'tourLimit' => Boarding::LITE_TOUR_LIMIT,
-            'tourLimitReached' => $tourLimitReached
+            'tourLimitReached' => $tourLimitReached,
         ];
     }
 
@@ -816,7 +816,7 @@ class ToursService extends Component
             'tour' => $tour,
             'primarySite' => $primarySite,
             'currentSite' => $site,
-            'isProEdition' => Boarding::getInstance()->is(Boarding::EDITION_PRO)
+            'isProEdition' => Boarding::getInstance()->is(Boarding::EDITION_PRO),
         ];
     }
 
@@ -833,7 +833,7 @@ class ToursService extends Component
     private function getUserGroupIds($user): array
     {
         $userGroups = Craft::$app->getUserGroups()->getGroupsByUserId($user->id);
-        return array_map(function ($group) {
+        return array_map(function($group) {
             return $group->id;
         }, $userGroups);
     }
@@ -1039,7 +1039,7 @@ class ToursService extends Component
             'name' => $siteName,
             'description' => $siteDescription,
             'steps' => $siteSteps,
-            'enabled' => $siteEnabled
+            'enabled' => $siteEnabled,
         ];
     }
 
@@ -1111,7 +1111,7 @@ class ToursService extends Component
                         'description' => $translationData['description'],
                         'data' => json_encode(['steps' => $translationData['steps']]),
                         'enabled' => $translationData['enabled'],
-                        'dateUpdated' => Db::prepareDateForDb(new \DateTime())
+                        'dateUpdated' => Db::prepareDateForDb(new \DateTime()),
                     ], ['tourId' => $tourId, 'siteId' => $siteId])
                     ->execute();
             } else {
@@ -1125,7 +1125,7 @@ class ToursService extends Component
                         'enabled' => $translationData['enabled'],
                         'dateCreated' => Db::prepareDateForDb(new \DateTime()),
                         'dateUpdated' => Db::prepareDateForDb(new \DateTime()),
-                        'uid' => StringHelper::UUID()
+                        'uid' => StringHelper::UUID(),
                     ])
                     ->execute();
             }
@@ -1154,7 +1154,7 @@ class ToursService extends Component
                     'name' => ($translation['name'] ?? '') . ' (Copy)',
                     'description' => $translation['description'] ?? '',
                     'steps' => JsonCache::decodeTranslationData($translation, $siteId)['steps'] ?? [],
-                    'enabled' => $translation['enabled'] ?? true
+                    'enabled' => $translation['enabled'] ?? true,
                 ]);
             }
         } catch (\Exception $e) {

@@ -2,12 +2,12 @@
 
 namespace zeix\boarding\helpers;
 
-use zeix\boarding\utils\Logger;
 use zeix\boarding\repositories\TourRepository;
+use zeix\boarding\utils\Logger;
 
 /**
  * BulkTourLoader - Efficient bulk loading of tour-related data
- * 
+ *
  * This class eliminates N+1 query problems by bulk loading related data
  * for multiple tours in single queries and caching the results.
  */
@@ -25,7 +25,7 @@ class BulkTourLoader
 
     /**
      * Get repository instance
-     * 
+     *
      * @return TourRepository
      */
     private static function getRepository(): TourRepository
@@ -38,7 +38,7 @@ class BulkTourLoader
 
     /**
      * Bulk load all related data for multiple tours
-     * 
+     *
      * @param array $tourIds Array of tour IDs
      * @param array $options Loading options
      * @return array Bulk loaded data indexed by type and tour ID
@@ -106,7 +106,7 @@ class BulkTourLoader
 
     /**
      * Create bulk-aware loaders for use with TourProcessor
-     * 
+     *
      * @param array $tourIds All tour IDs that will be processed
      * @param array $options Bulk loading options
      * @return array Array of loader functions
@@ -116,13 +116,13 @@ class BulkTourLoader
         $bulkData = self::bulkLoad($tourIds, $options);
 
         return [
-            'completions' => function ($tourId) use ($bulkData) {
+            'completions' => function($tourId) use ($bulkData) {
                 return $bulkData['completions'][$tourId] ?? [];
             },
-            'userGroups' => function ($tourId) use ($bulkData) {
+            'userGroups' => function($tourId) use ($bulkData) {
                 return $bulkData['userGroups'][$tourId] ?? [];
             },
-            'translations' => function ($tourId) use ($bulkData) {
+            'translations' => function($tourId) use ($bulkData) {
                 return $bulkData['translations'][$tourId] ?? [];
             },
         ];
@@ -130,7 +130,7 @@ class BulkTourLoader
 
     /**
      * Create bulk-aware admin loaders for TourProcessor
-     * 
+     *
      * @param array $tourIds Tour IDs to load
      * @return array Admin loader configuration
      */
@@ -150,7 +150,7 @@ class BulkTourLoader
 
     /**
      * Create bulk-aware user loaders for TourProcessor
-     * 
+     *
      * @param array $tourIds Tour IDs to load
      * @param callable $applyTranslationsLoader Function to apply translations
      * @return array User loader configuration
@@ -169,7 +169,7 @@ class BulkTourLoader
 
     /**
      * Get completions for a specific tour (fallback to individual query if not bulk loaded)
-     * 
+     *
      * @param int $tourId Tour ID
      * @return array Completions array
      */
@@ -186,7 +186,7 @@ class BulkTourLoader
 
     /**
      * Get user groups for a specific tour (fallback to individual query if not bulk loaded)
-     * 
+     *
      * @param int $tourId Tour ID
      * @return array User group IDs
      */
@@ -203,7 +203,7 @@ class BulkTourLoader
 
     /**
      * Get translations for a specific tour (fallback to individual query if not bulk loaded)
-     * 
+     *
      * @param int $tourId Tour ID
      * @return array Translations indexed by site ID
      */
@@ -220,7 +220,7 @@ class BulkTourLoader
 
     /**
      * Clear the bulk loading cache
-     * 
+     *
      * @return void
      */
     public static function clearCache(): void
@@ -230,7 +230,7 @@ class BulkTourLoader
 
     /**
      * Generate a cache key for bulk loaded data
-     * 
+     *
      * @param array $tourIds Tour IDs
      * @param array $options Loading options
      * @return string Cache key

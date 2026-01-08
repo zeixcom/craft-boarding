@@ -9,7 +9,7 @@ use craft\db\Table;
 
 /**
  * Migration to add propagation method for multi-site tour management
- * 
+ *
  * This replaces the simple translatable boolean with Craft's propagation method system
  */
 class m251020_130000_add_propagation_method extends Migration
@@ -115,7 +115,7 @@ class m251020_130000_add_propagation_method extends Migration
                 $this->delete(Table::ELEMENTS_SITES, [
                     'and',
                     ['elementId' => $tour['id']],
-                    ['!=', 'siteId', $tour['siteId']]
+                    ['!=', 'siteId', $tour['siteId']],
                 ]);
                 
                 echo "Cleaned up elements_sites for tour #{$tour['id']} (site-specific)\n";
@@ -172,4 +172,3 @@ class m251020_130000_add_propagation_method extends Migration
         echo "Created elements_sites entry for tour #{$elementId} on site #{$siteId}\n";
     }
 }
-

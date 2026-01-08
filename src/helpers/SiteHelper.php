@@ -56,7 +56,7 @@ class SiteHelper
 
     /**
      * Clean the site handle by removing any query parameters that might be appended
-     * 
+     *
      * @param string $siteHandle The raw site handle
      * @return string The cleaned site handle
      */

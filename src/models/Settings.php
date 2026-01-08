@@ -168,4 +168,4 @@ class Settings extends Model
             $this->getButtonTextsForSite($siteId)
         );
     }
-}   
+}

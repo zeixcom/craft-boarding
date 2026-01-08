@@ -5,12 +5,12 @@ namespace zeix\boarding\controllers;
 use Craft;
 use craft\helpers\Html;
 use craft\web\Controller;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use zeix\boarding\Boarding;
 use zeix\boarding\exceptions\TourException;
 use zeix\boarding\helpers\SiteHelper;
 use zeix\boarding\models\Tour;
-use yii\web\NotFoundHttpException;
 
 /**
  * Tours Controller - Simplified version
@@ -91,7 +91,7 @@ class ToursController extends Controller
         } catch (\Exception $e) {
             return $this->asJson([
                 'success' => false,
-                'error' => Craft::t('boarding', 'Failed to load tours. Please try again.')
+                'error' => Craft::t('boarding', 'Failed to load tours. Please try again.'),
             ]);
         }
     }
@@ -121,7 +121,7 @@ class ToursController extends Controller
         if (!$tourId) {
             return $this->asJson([
                 'success' => false,
-                'error' => Craft::t('boarding', 'No tour ID provided')
+                'error' => Craft::t('boarding', 'No tour ID provided'),
             ]);
         }
 
@@ -129,7 +129,7 @@ class ToursController extends Controller
             Boarding::getInstance()->tours->markTourCompleted($tourId);
             return $this->asJson([
                 'success' => true,
-                'message' => Craft::t('boarding', 'Tour marked as completed')
+                'message' => Craft::t('boarding', 'Tour marked as completed'),
             ]);
         } catch (TourException $e) {
             return $this->asJson(['success' => false, 'error' => $e->getMessage()]);
@@ -199,7 +199,7 @@ class ToursController extends Controller
         if ($existingTourCount >= Boarding::LITE_TOUR_LIMIT) {
             Craft::$app->getSession()->setError(
                 Craft::t('boarding', 'You have reached the maximum of {limit} tours allowed in Boarding Lite. Upgrade to Boarding Pro for unlimited tours.', [
-                    'limit' => Boarding::LITE_TOUR_LIMIT
+                    'limit' => Boarding::LITE_TOUR_LIMIT,
                 ])
             );
             return false;
@@ -284,9 +284,9 @@ class ToursController extends Controller
             return [];
         }
 
-        return array_values(array_filter(array_map(function ($id) {
+        return array_values(array_filter(array_map(function($id) {
             return is_numeric($id) ? (int)$id : null;
-        }, $userGroupIds), function ($id) {
+        }, $userGroupIds), function($id) {
             return $id !== null && $id > 0;
         }));
     }

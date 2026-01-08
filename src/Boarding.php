@@ -11,26 +11,26 @@
 
 namespace zeix\boarding;
 
-use zeix\boarding\services\ToursService;
-use zeix\boarding\services\ImportService;
-use zeix\boarding\assetbundles\BoardingAsset;
-use zeix\boarding\models\Settings;
-use zeix\boarding\models\Tour;
-use craft\events\RegisterComponentTypesEvent;
-use craft\events\RegisterTemplateRootsEvent;
-use craft\events\RegisterUserPermissionsEvent;
-use craft\services\Elements;
-use craft\services\UserPermissions;
-use craft\web\View;
-use craft\web\UrlManager;
-use craft\events\RegisterUrlRulesEvent;
-use zeix\boarding\helpers\SiteHelper;
-use yii\base\Event;
-use zeix\boarding\events\TourEvent;
-use craft\base\Plugin;
 use Craft;
 use craft\base\Model;
+use craft\base\Plugin;
+use craft\events\RegisterComponentTypesEvent;
+use craft\events\RegisterTemplateRootsEvent;
+use craft\events\RegisterUrlRulesEvent;
+use craft\events\RegisterUserPermissionsEvent;
 use craft\helpers\Json;
+use craft\services\Elements;
+use craft\services\UserPermissions;
+use craft\web\UrlManager;
+use craft\web\View;
+use yii\base\Event;
+use zeix\boarding\assetbundles\BoardingAsset;
+use zeix\boarding\events\TourEvent;
+use zeix\boarding\helpers\SiteHelper;
+use zeix\boarding\models\Settings;
+use zeix\boarding\models\Tour;
+use zeix\boarding\services\ImportService;
+use zeix\boarding\services\ToursService;
 
 /**
  * Boarding plugin for Craft CMS
@@ -121,7 +121,7 @@ class Boarding extends Plugin
         Event::on(
             Elements::class,
             Elements::EVENT_REGISTER_ELEMENT_TYPES,
-            function (RegisterComponentTypesEvent $event) {
+            function(RegisterComponentTypesEvent $event) {
                 $event->types[] = Tour::class;
             }
         );
@@ -129,7 +129,7 @@ class Boarding extends Plugin
         Event::on(
             Tour::class,
             Tour::EVENT_AFTER_SAVE_TOUR,
-            function (TourEvent $event) {
+            function(TourEvent $event) {
                 Boarding::getInstance()->tours->saveTourUserGroups(
                     $event->tour->id,
                     $event->tour->userGroupIds
@@ -140,7 +140,7 @@ class Boarding extends Plugin
         Event::on(
             View::class,
             View::EVENT_REGISTER_CP_TEMPLATE_ROOTS,
-            function (RegisterTemplateRootsEvent $event) {
+            function(RegisterTemplateRootsEvent $event) {
                 $event->roots['boarding'] = $this->getBasePath() . '/templates';
             }
         );
@@ -148,7 +148,7 @@ class Boarding extends Plugin
         Event::on(
             UserPermissions::class,
             UserPermissions::EVENT_REGISTER_PERMISSIONS,
-            function (RegisterUserPermissionsEvent $event) {
+            function(RegisterUserPermissionsEvent $event) {
                 $event->permissions[] = [
                     'heading' => Craft::t('boarding', 'Onboarding Tours'),
                     'permissions' => $this->_registerPermissions(),
@@ -159,7 +159,7 @@ class Boarding extends Plugin
         Event::on(
             UrlManager::class,
             UrlManager::EVENT_REGISTER_CP_URL_RULES,
-            function (RegisterUrlRulesEvent $event) {
+            function(RegisterUrlRulesEvent $event) {
                 $rules = [
                     'boarding' => 'boarding/tours/index',
                     'boarding/tours' => 'boarding/tours/index',
@@ -174,7 +174,7 @@ class Boarding extends Plugin
             }
         );
 
-        Craft::$app->onInit(function () {
+        Craft::$app->onInit(function() {
             if (Craft::$app->request->getIsCpRequest()) {
                 /** @var Settings $settings */
                 $settings = $this->getSettings();
@@ -353,7 +353,7 @@ class Boarding extends Plugin
             $subnav['settings'] = [
                 'label' => Craft::t('boarding', 'Settings'),
                 'url' => 'boarding/settings',
-                'icon' => '@boarding/icon.svg'
+                'icon' => '@boarding/icon.svg',
             ];
         }
         $item['subnav'] = $subnav;
@@ -406,16 +406,16 @@ class Boarding extends Plugin
     {
         return [
             'boarding:createtours' => [
-                'label' => Craft::t('boarding', 'Create tours')
+                'label' => Craft::t('boarding', 'Create tours'),
             ],
             'boarding:edittours' => [
-                'label' => Craft::t('boarding', 'Edit tours')
+                'label' => Craft::t('boarding', 'Edit tours'),
             ],
             'boarding:deletetours' => [
-                'label' => Craft::t('boarding', 'Delete tours')
+                'label' => Craft::t('boarding', 'Delete tours'),
             ],
             'boarding:managetoursettings' => [
-                'label' => Craft::t('boarding', 'Manage tour settings')
+                'label' => Craft::t('boarding', 'Manage tour settings'),
             ],
         ];
     }

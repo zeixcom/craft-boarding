@@ -39,7 +39,7 @@ class SettingsController extends Controller
             'siteSettings' => $siteSettings,
             'siteButtonTexts' => $siteButtonTexts,
             'isProEdition' => $isProEdition,
-            'isMultiSite' => $isMultiSite
+            'isMultiSite' => $isMultiSite,
         ]);
     }
 

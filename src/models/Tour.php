@@ -6,16 +6,13 @@ use Craft;
 use craft\base\Element;
 use craft\elements\actions\Delete;
 use craft\elements\actions\Edit;
-use craft\elements\db\ElementQueryInterface;
+use craft\elements\User;
 use craft\helpers\Json;
 use craft\helpers\UrlHelper;
-use zeix\boarding\elements\db\TourQuery;
-use zeix\boarding\records\TourRecord;
-use zeix\boarding\events\TourEvent;
-use zeix\boarding\utils\Logger;
-use craft\elements\User;
-use Exception;
 use zeix\boarding\Boarding;
+use zeix\boarding\elements\db\TourQuery;
+use zeix\boarding\events\TourEvent;
+use zeix\boarding\records\TourRecord;
 
 /**
  * Tour model representing a boarding tour.
@@ -184,9 +181,9 @@ class Tour extends Element
                 'key' => '*',
                 'label' => Craft::t('boarding', 'All tours'),
                 'criteria' => [
-                    'status' => null
-                ]
-            ]
+                    'status' => null,
+                ],
+            ],
         ];
     }
 
@@ -269,7 +266,7 @@ class Tour extends Element
      */
     private function getAllSitesConfig(): array
     {
-        return array_map(function ($site) {
+        return array_map(function($site) {
             return [
                 'siteId' => $site->id,
                 'enabledByDefault' => true,
@@ -433,7 +430,7 @@ class Tour extends Element
         }
 
         $encoded = Json::encode([
-            'steps' => $this->_steps
+            'steps' => $this->_steps,
         ]);
 
         return $encoded;
@@ -506,7 +503,7 @@ class Tour extends Element
         // the current site on first save to avoid duplicate key errors
         if ($isNew && !$this->propagating && in_array($this->propagationMethod, [
             self::PROPAGATION_METHOD_LANGUAGE,
-            self::PROPAGATION_METHOD_SITE_GROUP
+            self::PROPAGATION_METHOD_SITE_GROUP,
         ])) {
             $this->ensureElementSitesEntries();
         }
@@ -769,7 +766,7 @@ class Tour extends Element
         if (in_array($this->propagationMethod, [
             self::PROPAGATION_METHOD_ALL,
             self::PROPAGATION_METHOD_LANGUAGE,
-            self::PROPAGATION_METHOD_SITE_GROUP
+            self::PROPAGATION_METHOD_SITE_GROUP,
         ])) {
             $this->propagateTitleAndDescription();
         }

@@ -6,7 +6,7 @@ use Craft;
 
 /**
  * TranslationProcessor - Centralized translation data processing
- * 
+ *
  * This class provides consistent methods for handling translation data processing,
  * reducing duplication and ensuring consistent behavior across the plugin.
  */
@@ -14,7 +14,7 @@ class TranslationProcessor
 {
     /**
      * Apply translations to a tour for a specific site
-     * 
+     *
      * @param array $tour The tour data
      * @param int $siteId The site ID to apply translations for
      * @param int|null $primarySiteId Primary site ID (will be fetched if null)
@@ -72,7 +72,7 @@ class TranslationProcessor
     /**
      * Fix inline step translations for single-site tours (legacy data)
      * This handles cases where content was saved in translations object instead of main fields
-     * 
+     *
      * @param array $tour The tour data
      * @param int $siteId The current site ID
      * @return array The tour with fixed steps
@@ -135,7 +135,7 @@ class TranslationProcessor
 
     /**
      * Attach step-level translations to tour steps
-     * 
+     *
      * @param array $tour The tour data with steps
      * @param array $translations The translations data indexed by site ID
      * @return array The tour with step translations attached
@@ -164,7 +164,7 @@ class TranslationProcessor
 
     /**
      * Process tour data and conditionally load translations
-     * 
+     *
      * @param array $tour The tour data
      * @param callable $translationLoader Function to load translations (receives tourId)
      * @return array The processed tour
@@ -182,7 +182,7 @@ class TranslationProcessor
 
     /**
      * Extract and process step translations from form data
-     * 
+     *
      * @param array $steps The steps data from form submission
      * @return array Processed steps with translation data
      */
@@ -214,7 +214,7 @@ class TranslationProcessor
 
                     $processedStep['translations'][$siteId] = [
                         'title' => $siteTranslation['title'] ?? '',
-                        'text' => $siteTranslation['text'] ?? ''
+                        'text' => $siteTranslation['text'] ?? '',
                     ];
 
                     if (($step['type'] ?? 'default') === 'navigation' && isset($siteTranslation['navigationButtonText'])) {
@@ -231,13 +231,13 @@ class TranslationProcessor
 
     /**
      * Clean step data by removing translation information
-     * 
+     *
      * @param array $steps Array of steps
      * @return array Steps with translations removed
      */
     public static function cleanStepsFromTranslations(array $steps): array
     {
-        return array_map(function ($step) {
+        return array_map(function($step) {
             unset($step['translations']);
             return $step;
         }, $steps);
@@ -245,7 +245,7 @@ class TranslationProcessor
 
     /**
      * Decode translation data safely with caching
-     * 
+     *
      * @param string $data JSON encoded translation data
      * @return array Decoded data or empty array on failure
      */
@@ -277,7 +277,7 @@ class TranslationProcessor
 
     /**
      * Get site-specific translation data for current site context
-     * 
+     *
      * @param array $translations All translations indexed by site ID
      * @param int $currentSiteId Current site ID
      * @return array Translation data for the current site
@@ -295,7 +295,7 @@ class TranslationProcessor
 
     /**
      * Merge existing tour data with new translation data
-     * 
+     *
      * @param array $existingTour Existing tour data
      * @param array $newData New translation data
      * @param bool $preserveSteps Whether to preserve existing steps structure

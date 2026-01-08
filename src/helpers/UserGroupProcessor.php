@@ -3,14 +3,14 @@
 namespace zeix\boarding\helpers;
 
 use Craft;
-use craft\helpers\StringHelper;
 use craft\helpers\Db;
+use craft\helpers\StringHelper;
 use zeix\boarding\records\TourUserGroupRecord;
 use zeix\boarding\utils\Logger;
 
 /**
  * UserGroupProcessor - Optimized user group management for tours
- * 
+ *
  * This class provides efficient batch operations for managing tour user group
  * assignments, eliminating performance bottlenecks from individual saves.
  */
@@ -18,7 +18,7 @@ class UserGroupProcessor
 {
     /**
      * Save user group assignments for a tour using optimized batch operations
-     * 
+     *
      * @param int $tourId Tour database ID
      * @param array $userGroupIds Array of user group IDs (mixed format support)
      * @return bool Success status
@@ -48,8 +48,8 @@ class UserGroupProcessor
 
     /**
      * Save user groups for multiple tours in a single batch operation
-     * 
-     * @param array $tourUserGroups Array of [tourId => [userGroupIds]] 
+     *
+     * @param array $tourUserGroups Array of [tourId => [userGroupIds]]
      * @return bool Success status
      */
     public static function batchSaveTourUserGroups(array $tourUserGroups): bool
@@ -76,7 +76,7 @@ class UserGroupProcessor
                         'userGroupId' => $groupId,
                         'dateCreated' => Db::prepareDateForDb(new \DateTime()),
                         'dateUpdated' => Db::prepareDateForDb(new \DateTime()),
-                        'uid' => StringHelper::UUID()
+                        'uid' => StringHelper::UUID(),
                     ];
                 }
             }
@@ -85,13 +85,13 @@ class UserGroupProcessor
                 $db->createCommand()->batchInsert(
                     TourUserGroupRecord::tableName(),
                     ['tourId', 'userGroupId', 'dateCreated', 'dateUpdated', 'uid'],
-                    array_map(function ($record) {
+                    array_map(function($record) {
                         return [
                             $record['tourId'],
                             $record['userGroupId'],
                             $record['dateCreated'],
                             $record['dateUpdated'],
-                            $record['uid']
+                            $record['uid'],
                         ];
                     }, $allRecords)
                 )->execute();
@@ -108,7 +108,7 @@ class UserGroupProcessor
 
     /**
      * Process and clean user group IDs from various input formats
-     * 
+     *
      * @param array $userGroupIds Raw user group IDs (mixed format)
      * @return array Clean integer array of user group IDs
      */
@@ -134,7 +134,7 @@ class UserGroupProcessor
 
     /**
      * Delete existing user group assignments for a tour
-     * 
+     *
      * @param int $tourId Tour ID
      * @return void
      */
@@ -150,7 +150,7 @@ class UserGroupProcessor
 
     /**
      * Batch insert user group assignments using raw SQL for optimal performance
-     * 
+     *
      * @param int $tourId Tour ID
      * @param array $cleanUserGroupIds Clean user group IDs
      * @return void
@@ -166,10 +166,10 @@ class UserGroupProcessor
         foreach ($cleanUserGroupIds as $groupId) {
             $rows[] = [
                 $tourId,           // tourId
-                $groupId,          // userGroupId  
+                $groupId,          // userGroupId
                 $now,              // dateCreated
                 $now,              // dateUpdated
-                StringHelper::UUID() // uid
+                StringHelper::UUID(), // uid
             ];
         }
 
@@ -182,7 +182,7 @@ class UserGroupProcessor
 
     /**
      * Flatten nested user group ID arrays
-     * 
+     *
      * @param array $userGroupIds Potentially nested array
      * @return array Flattened array
      */
@@ -203,7 +203,7 @@ class UserGroupProcessor
 
     /**
      * Normalize a single user group ID to integer or null
-     * 
+     *
      * @param mixed $item Raw user group ID
      * @return int|null Normalized ID or null if invalid
      */
@@ -231,7 +231,7 @@ class UserGroupProcessor
 
     /**
      * Validate user group assignments for a tour
-     * 
+     *
      * @param int $tourId Tour ID
      * @param array $expectedGroupIds Expected group IDs
      * @return bool Whether assignments match expectations

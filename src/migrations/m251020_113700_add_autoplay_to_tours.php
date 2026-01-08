@@ -41,4 +41,3 @@ class m251020_113700_add_autoplay_to_tours extends Migration
         return true;
     }
 }
-

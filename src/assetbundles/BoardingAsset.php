@@ -44,7 +44,7 @@ class BoardingAsset extends AssetBundle
         $view->registerJsFile(
             'https://cdn.jsdelivr.net/npm/shepherd.js@11.2.0/dist/js/shepherd.min.js',
             [
-                'position' => \yii\web\View::POS_HEAD
+                'position' => \yii\web\View::POS_HEAD,
             ]
         );
 

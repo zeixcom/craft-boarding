@@ -72,7 +72,7 @@ class TourQuery extends ElementQuery
                     'not exists',
                     (new \craft\db\Query())
                         ->from(['tug' => '{{%boarding_tours_usergroups}}'])
-                        ->where('[[tug.tourId]] = [[boarding_tours.id]]')
+                        ->where('[[tug.tourId]] = [[boarding_tours.id]]'),
                 ]);
             } else {
                 // Show tours that either:
@@ -85,14 +85,14 @@ class TourQuery extends ElementQuery
                         (new \craft\db\Query())
                             ->from(['tug1' => '{{%boarding_tours_usergroups}}'])
                             ->where('[[tug1.tourId]] = [[boarding_tours.id]]')
-                            ->andWhere(['tug1.userGroupId' => $userGroupIds])
+                            ->andWhere(['tug1.userGroupId' => $userGroupIds]),
                     ],
                     [
                         'not exists',
                         (new \craft\db\Query())
                             ->from(['tug2' => '{{%boarding_tours_usergroups}}'])
-                            ->where('[[tug2.tourId]] = [[boarding_tours.id]]')
-                    ]
+                            ->where('[[tug2.tourId]] = [[boarding_tours.id]]'),
+                    ],
                 ]);
             }
         }

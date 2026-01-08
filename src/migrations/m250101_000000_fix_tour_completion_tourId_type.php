@@ -2,7 +2,6 @@
 
 namespace zeix\boarding\migrations;
 
-use Craft;
 use craft\db\Migration;
 
 class m250101_000000_fix_tour_completion_tourId_type extends Migration

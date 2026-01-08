@@ -7,10 +7,9 @@ use craft\base\Component;
 use craft\db\Query;
 use craft\helpers\Db;
 use craft\helpers\StringHelper;
-use zeix\boarding\Boarding;
 use zeix\boarding\config\ImportConfig;
-use zeix\boarding\repositories\TourRepository;
 use zeix\boarding\models\Tour;
+use zeix\boarding\repositories\TourRepository;
 
 /**
  * ImportService handles tour import functionality
@@ -19,7 +18,7 @@ class ImportService extends Component
 {
     /**
      * Process the tours import
-     * 
+     *
      * @param array $tours Array of tour data to import
      * @return array Import results with counts and errors
      */
@@ -29,14 +28,14 @@ class ImportService extends Component
             'imported' => 0,
             'updated' => 0,
             'skipped' => 0,
-            'errors' => []
+            'errors' => [],
         ];
 
         foreach ($tours as $index => $tourData) {
             try {
                 if (empty($tourData['name']) || empty($tourData['tourId'])) {
                     $results['errors'][] = Craft::t('boarding', 'Tour #{index}: Missing required name or tourId', [
-                        'index' => $index + 1
+                        'index' => $index + 1,
                     ]);
                     $results['skipped']++;
                     continue;
@@ -58,7 +57,7 @@ class ImportService extends Component
                     'steps' => [],
                     'progressPosition' => 'bottom',
                     'autoplay' => false,
-                    'completedBy' => []
+                    'completedBy' => [],
                 ], $tourData);
 
                 $tourData['enabled'] = (bool)($tourData['enabled'] ?? true);
@@ -117,7 +116,7 @@ class ImportService extends Component
                         $results['errors'][] = Craft::t('boarding', 'Tour #{index}: Failed to save "{name}": {error}', [
                             'index' => $index + 1,
                             'name' => $tourData['name'],
-                            'error' => $errorMsg
+                            'error' => $errorMsg,
                         ]);
                         $results['skipped']++;
                     }
@@ -125,14 +124,14 @@ class ImportService extends Component
                     $results['errors'][] = Craft::t('boarding', 'Tour #{index}: Exception saving "{name}": {error}', [
                         'index' => $index + 1,
                         'name' => $tourData['name'],
-                        'error' => $e->getMessage()
+                        'error' => $e->getMessage(),
                     ]);
                     $results['skipped']++;
                 }
             } catch (\Exception $e) {
                 $results['errors'][] = Craft::t('boarding', 'Tour #{index}: {error}', [
                     'index' => $index + 1,
-                    'error' => $e->getMessage()
+                    'error' => $e->getMessage(),
                 ]);
                 $results['skipped']++;
             }
@@ -143,7 +142,7 @@ class ImportService extends Component
 
     /**
      * Build a detailed import message from results
-     * 
+     *
      * @param array $results Import results
      * @return string Formatted message
      */
@@ -164,12 +163,12 @@ class ImportService extends Component
         }
 
         $message = Craft::t('boarding', 'Import completed: {summary}', [
-            'summary' => implode(', ', $parts) ?: '0 tours processed'
+            'summary' => implode(', ', $parts) ?: '0 tours processed',
         ]);
 
         if (!empty($results['errors'])) {
             $message .= '. ' . Craft::t('boarding', 'Errors: {count}', [
-                'count' => count($results['errors'])
+                'count' => count($results['errors']),
             ]);
         }
 
@@ -217,7 +216,7 @@ class ImportService extends Component
         // Validate tour count doesn't exceed limit
         if (count($tours) > ImportConfig::MAX_TOURS_PER_IMPORT) {
             $errors[] = Craft::t('boarding', 'Import contains too many tours. Maximum allowed is {max}.', [
-                'max' => ImportConfig::MAX_TOURS_PER_IMPORT
+                'max' => ImportConfig::MAX_TOURS_PER_IMPORT,
             ]);
         }
 
@@ -245,7 +244,7 @@ class ImportService extends Component
         // Check if tour is an array
         if (!is_array($tour)) {
             $errors[] = Craft::t('boarding', 'Tour #{num}: Invalid tour data structure', [
-                'num' => $tourNum
+                'num' => $tourNum,
             ]);
             return $errors;
         }
@@ -253,13 +252,13 @@ class ImportService extends Component
         // Validate required fields
         if (empty($tour['name']) || !is_string($tour['name'])) {
             $errors[] = Craft::t('boarding', 'Tour #{num}: Missing or invalid name field', [
-                'num' => $tourNum
+                'num' => $tourNum,
             ]);
         }
 
         if (empty($tour['tourId']) || !is_string($tour['tourId'])) {
             $errors[] = Craft::t('boarding', 'Tour #{num}: Missing or invalid tourId field', [
-                'num' => $tourNum
+                'num' => $tourNum,
             ]);
         }
 
@@ -267,12 +266,12 @@ class ImportService extends Component
         if (isset($tour['steps'])) {
             if (!is_array($tour['steps'])) {
                 $errors[] = Craft::t('boarding', 'Tour #{num}: Steps must be an array', [
-                    'num' => $tourNum
+                    'num' => $tourNum,
                 ]);
             } elseif (count($tour['steps']) > ImportConfig::MAX_STEPS_PER_TOUR) {
                 $errors[] = Craft::t('boarding', 'Tour #{num}: Too many steps. Maximum allowed is {max}.', [
                     'num' => $tourNum,
-                    'max' => ImportConfig::MAX_STEPS_PER_TOUR
+                    'max' => ImportConfig::MAX_STEPS_PER_TOUR,
                 ]);
             }
         }
@@ -284,7 +283,7 @@ class ImportService extends Component
         ) {
             $errors[] = Craft::t('boarding', 'Tour #{num}: Invalid progressPosition value "{value}"', [
                 'num' => $tourNum,
-                'value' => $tour['progressPosition']
+                'value' => $tour['progressPosition'],
             ]);
         }
 
@@ -294,7 +293,7 @@ class ImportService extends Component
             !in_array($tour['enabled'], [0, 1, '0', '1', true, false])
         ) {
             $errors[] = Craft::t('boarding', 'Tour #{num}: Invalid enabled value', [
-                'num' => $tourNum
+                'num' => $tourNum,
             ]);
         }
 
@@ -303,7 +302,7 @@ class ImportService extends Component
 
     /**
      * Import completion data for a tour
-     * 
+     *
      * @param string $tourId Tour ID
      * @param array $completions Array of completion data
      * @param array &$results Results array to add errors to
@@ -322,7 +321,7 @@ class ImportService extends Component
 
             if (!$tour) {
                 $results['errors'][] = Craft::t('boarding', 'Tour #{index}: Could not find saved tour to import completions', [
-                    'index' => $tourIndex + 1
+                    'index' => $tourIndex + 1,
                 ]);
                 return;
             }
@@ -358,7 +357,7 @@ class ImportService extends Component
                                 'userId' => $user->id,
                                 'dateCreated' => $completedAt,
                                 'dateUpdated' => $completedAt,
-                                'uid' => StringHelper::UUID()
+                                'uid' => StringHelper::UUID(),
                             ])
                             ->execute();
 
@@ -373,13 +372,13 @@ class ImportService extends Component
                 $results['errors'][] = Craft::t('boarding', 'Tour #{index}: {errorCount} completion(s) could not be imported, {successCount} imported successfully', [
                     'index' => $tourIndex + 1,
                     'errorCount' => $errorCount,
-                    'successCount' => $completionCount
+                    'successCount' => $completionCount,
                 ]);
             }
         } catch (\Exception $e) {
             $results['errors'][] = Craft::t('boarding', 'Tour #{index}: Error importing completions: {error}', [
                 'index' => $tourIndex + 1,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
         }
     }
@@ -449,7 +448,7 @@ class ImportService extends Component
                 $tourData = array_combine($headers, $row);
                 if ($tourData === false) {
                     throw new \Exception(Craft::t('boarding', 'CSV row {row} has mismatched column count', [
-                        'row' => $rowNumber
+                        'row' => $rowNumber,
                     ]));
                 }
 
@@ -489,7 +488,7 @@ class ImportService extends Component
             'slug',
             'uri',
             'content',
-            'enabledforsite'
+            'enabledforsite',
         ];
 
         // Map CSV column names to expected tour fields (case-insensitive)
@@ -630,7 +629,7 @@ class ImportService extends Component
                 $errorMsg = !empty($errors) ? $errors[0]->message : 'Unknown XML parsing error';
                 libxml_clear_errors();
                 throw new \Exception(Craft::t('boarding', 'Invalid XML format: {error}', [
-                    'error' => trim($errorMsg)
+                    'error' => trim($errorMsg),
                 ]));
             }
 
@@ -679,7 +678,7 @@ class ImportService extends Component
             'slug',
             'uri',
             'content',
-            'enabledForSite'
+            'enabledForSite',
         ];
 
         // Map XML elements/attributes to tour fields

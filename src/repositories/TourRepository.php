@@ -4,14 +4,14 @@ namespace zeix\boarding\repositories;
 
 use Craft;
 use craft\db\Query;
-use craft\helpers\StringHelper;
 use craft\helpers\Db;
+use craft\helpers\StringHelper;
 use zeix\boarding\helpers\DatabaseSchemaHelper;
 use zeix\boarding\utils\Logger;
 
 /**
  * TourRepository - Consistent data access layer for tour operations
- * 
+ *
  * This repository provides a unified interface for all tour-related database operations,
  * standardizing data access patterns and eliminating mixed ActiveRecord/QueryBuilder usage.
  */
@@ -19,7 +19,7 @@ class TourRepository
 {
     /**
      * Find a tour by its database ID
-     * 
+     *
      * @param int $id Tour database ID
      * @return array|null Tour data or null if not found
      */
@@ -38,7 +38,7 @@ class TourRepository
 
     /**
      * Find a tour by its tourId string
-     * 
+     *
      * @param string $tourId Tour ID string
      * @return array|null Tour data or null if not found
      */
@@ -57,7 +57,7 @@ class TourRepository
 
     /**
      * Get all tours for admin interface
-     * 
+     *
      * @param array $options Query options
      * @return array Tours array
      */
@@ -66,7 +66,7 @@ class TourRepository
         $defaultOptions = [
             'includeTranslatable' => true,
             'enabledOnly' => false,
-            'orderBy' => ['t.dateCreated' => SORT_DESC]
+            'orderBy' => ['t.dateCreated' => SORT_DESC],
         ];
 
         $options = array_merge($defaultOptions, $options);
@@ -91,7 +91,7 @@ class TourRepository
 
     /**
      * Find tours for a specific user
-     * 
+     *
      * @param int $userId User ID
      * @param array $userGroupIds User's group IDs
      * @param array $options Query options
@@ -102,7 +102,7 @@ class TourRepository
         $defaultOptions = [
             'includeTranslatable' => true,
             'siteId' => null,
-            'orderBy' => ['t.dateCreated' => SORT_DESC]
+            'orderBy' => ['t.dateCreated' => SORT_DESC],
         ];
 
         $options = array_merge($defaultOptions, $options);
@@ -133,7 +133,7 @@ class TourRepository
 
     /**
      * Save a tour (create or update)
-     * 
+     *
      * @param array $data Tour data
      * @return int|false Tour ID on success, false on failure
      */
@@ -170,7 +170,7 @@ class TourRepository
 
     /**
      * Delete a tour and all related data
-     * 
+     *
      * @param int $id Tour database ID
      * @return bool Success status
      */
@@ -199,7 +199,7 @@ class TourRepository
 
     /**
      * Get completions for a tour
-     * 
+     *
      * @param int $tourId Tour ID
      * @return array Completions array
      */
@@ -212,7 +212,7 @@ class TourRepository
                     'u.firstName',
                     'u.lastName',
                     'u.username',
-                    'tc.dateCreated as completedAt'
+                    'tc.dateCreated as completedAt',
                 ])
                 ->from(['tc' => '{{%boarding_tour_completions}}'])
                 ->leftJoin(['u' => '{{%users}}'], '[[u.id]] = [[tc.userId]]')
@@ -227,7 +227,7 @@ class TourRepository
 
     /**
      * Get user groups for a tour
-     * 
+     *
      * @param int $tourId Tour ID
      * @return array User group IDs
      */
@@ -247,7 +247,7 @@ class TourRepository
 
     /**
      * Get translations for a tour
-     * 
+     *
      * @param int $tourId Tour ID
      * @return array Translations indexed by site ID
      */
@@ -270,7 +270,7 @@ class TourRepository
                     'name' => $result['name'],
                     'description' => $result['description'],
                     'data' => $result['data'],
-                    'enabled' => $result['enabled'] !== null ? (bool)$result['enabled'] : true
+                    'enabled' => $result['enabled'] !== null ? (bool)$result['enabled'] : true,
                 ];
             }
 
@@ -283,7 +283,7 @@ class TourRepository
 
     /**
      * Mark a tour as completed for a user
-     * 
+     *
      * @param int $tourId Tour database ID
      * @param int $userId User ID
      * @return bool Success status
@@ -306,7 +306,7 @@ class TourRepository
                     'userId' => $userId,
                     'dateCreated' => Db::prepareDateForDb(new \DateTime()),
                     'dateUpdated' => Db::prepareDateForDb(new \DateTime()),
-                    'uid' => StringHelper::UUID()
+                    'uid' => StringHelper::UUID(),
                 ])
                 ->execute();
 
@@ -319,7 +319,7 @@ class TourRepository
 
     /**
      * Bulk load completions for multiple tours
-     * 
+     *
      * @param array $tourIds Tour IDs
      * @return array Completions indexed by tour ID
      */
@@ -337,7 +337,7 @@ class TourRepository
                     'u.firstName',
                     'u.lastName',
                     'u.username',
-                    'tc.dateCreated as completedAt'
+                    'tc.dateCreated as completedAt',
                 ])
                 ->from(['tc' => '{{%boarding_tour_completions}}'])
                 ->leftJoin(['u' => '{{%users}}'], '[[u.id]] = [[tc.userId]]')
@@ -371,7 +371,7 @@ class TourRepository
 
     /**
      * Bulk load user groups for multiple tours
-     * 
+     *
      * @param array $tourIds Tour IDs
      * @return array User groups indexed by tour ID
      */
@@ -414,7 +414,7 @@ class TourRepository
 
     /**
      * Bulk load translations for multiple tours
-     * 
+     *
      * @param array $tourIds Tour IDs
      * @return array Translations indexed by tour ID, then site ID
      */
@@ -452,7 +452,7 @@ class TourRepository
                     'name' => $result['name'],
                     'description' => $result['description'],
                     'data' => $result['data'],
-                    'enabled' => $result['enabled'] !== null ? (bool)$result['enabled'] : true
+                    'enabled' => $result['enabled'] !== null ? (bool)$result['enabled'] : true,
                 ];
             }
 
@@ -471,7 +471,7 @@ class TourRepository
 
     /**
      * Check if a tour is enabled for a specific site
-     * 
+     *
      * @param int $tourId Tour ID
      * @param int $siteId Site ID
      * @return bool Whether the tour is enabled
@@ -510,7 +510,7 @@ class TourRepository
 
     /**
      * Build the base tour query with standard fields
-     * 
+     *
      * @param array $options Query options
      * @return Query
      */
@@ -518,7 +518,7 @@ class TourRepository
     {
         $defaultOptions = [
             'includeTranslatable' => true,
-            'includeUserGroups' => true
+            'includeUserGroups' => true,
         ];
 
         $options = array_merge($defaultOptions, $options);
@@ -533,7 +533,7 @@ class TourRepository
                 't.enabled',
                 't.dateCreated',
                 't.dateUpdated',
-                't.uid'
+                't.uid',
             ])
             ->from(['t' => '{{%boarding_tours}}']);
 
@@ -551,11 +551,11 @@ class TourRepository
 
             if ($isPostgres) {
                 $query->addSelect([
-                    '(SELECT STRING_AGG(DISTINCT tug.[[userGroupId]]::text, \',\') FROM {{%boarding_tours_usergroups}} tug WHERE tug.[[tourId]] = t.[[id]]) as userGroupIds'
+                    '(SELECT STRING_AGG(DISTINCT tug.[[userGroupId]]::text, \',\') FROM {{%boarding_tours_usergroups}} tug WHERE tug.[[tourId]] = t.[[id]]) as userGroupIds',
                 ]);
             } else {
                 $query->addSelect([
-                    '(SELECT GROUP_CONCAT(DISTINCT tug.[[userGroupId]]) FROM {{%boarding_tours_usergroups}} tug WHERE tug.[[tourId]] = t.[[id]]) as userGroupIds'
+                    '(SELECT GROUP_CONCAT(DISTINCT tug.[[userGroupId]]) FROM {{%boarding_tours_usergroups}} tug WHERE tug.[[tourId]] = t.[[id]]) as userGroupIds',
                 ]);
             }
         }
@@ -565,7 +565,7 @@ class TourRepository
 
     /**
      * Apply user group filtering to query
-     * 
+     *
      * @param Query $query Query to modify
      * @param array $userGroupIds User group IDs
      */
@@ -579,21 +579,21 @@ class TourRepository
                     (new Query())
                         ->from(['tug1' => '{{%boarding_tours_usergroups}}'])
                         ->where('[[tug1.tourId]] = [[t.id]]')
-                        ->andWhere(['tug1.userGroupId' => $userGroupIds])
+                        ->andWhere(['tug1.userGroupId' => $userGroupIds]),
                 ],
                 [
                     'not exists',
                     (new Query())
                         ->from(['tug2' => '{{%boarding_tours_usergroups}}'])
-                        ->where('[[tug2.tourId]] = [[t.id]]')
-                ]
+                        ->where('[[tug2.tourId]] = [[t.id]]'),
+                ],
             ]);
         }
     }
 
     /**
      * Add completion status to query (shows all tours but includes completion info)
-     * 
+     *
      * @param Query $query Query to modify
      * @param int $userId User ID
      */
@@ -609,7 +609,7 @@ class TourRepository
 
     /**
      * Apply site-specific enabled filtering to query
-     * 
+     *
      * @param Query $query Query to modify
      * @param int $siteId Site ID
      */
@@ -630,7 +630,7 @@ class TourRepository
                 $query->andWhere([
                     'or',
                     ['and', ['not', ['ti18n.id' => null]], ['ti18n.enabled' => true]],
-                    ['and', ['ti18n.id' => null], ['t.enabled' => true]]
+                    ['and', ['ti18n.id' => null], ['t.enabled' => true]],
                 ]);
             }
         } catch (\Exception) {
@@ -640,7 +640,7 @@ class TourRepository
 
     /**
      * Create a new tour record
-     * 
+     *
      * @param array $data Tour data
      * @return int|false Tour ID on success, false on failure
      */
@@ -657,7 +657,7 @@ class TourRepository
                 'enabled' => $data['enabled'] ?? true,
                 'dateCreated' => $now,
                 'dateUpdated' => $now,
-                'uid' => StringHelper::UUID()
+                'uid' => StringHelper::UUID(),
             ];
 
             if (isset($data['progressPosition']) && DatabaseSchemaHelper::hasProgressPositionColumn()) {
@@ -685,7 +685,7 @@ class TourRepository
 
     /**
      * Update an existing tour record
-     * 
+     *
      * @param int $tourId Tour database ID
      * @param array $data Tour data
      * @return bool Success status
@@ -694,7 +694,7 @@ class TourRepository
     {
         try {
             $updateData = [
-                'dateUpdated' => Db::prepareDateForDb(new \DateTime())
+                'dateUpdated' => Db::prepareDateForDb(new \DateTime()),
             ];
 
             $allowedFields = ['name', 'description', 'data', 'enabled', 'progressPosition', 'autoplay', 'siteId'];
@@ -725,7 +725,7 @@ class TourRepository
 
     /**
      * Delete completions for a tour
-     * 
+     *
      * @param int $tourId Tour ID
      */
     private function deleteCompletions(int $tourId): void
@@ -737,7 +737,7 @@ class TourRepository
 
     /**
      * Delete user groups for a tour
-     * 
+     *
      * @param int $tourId Tour ID
      */
     private function deleteUserGroups(int $tourId): void
@@ -749,7 +749,7 @@ class TourRepository
 
     /**
      * Delete translations for a tour
-     * 
+     *
      * @param int $tourId Tour ID
      */
     private function deleteTranslations(int $tourId): void

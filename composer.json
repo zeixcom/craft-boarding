@@ -31,7 +31,9 @@
         "codeception/codeception": "^5.0",
         "codeception/module-yii2": "^1.1",
         "codeception/module-asserts": "^3.0",
+        "craftcms/ecs": "dev-main",
         "craftcms/phpstan": "dev-main",
+        "craftcms/rector": "dev-main",
         "phpstan/phpstan": "^1.10.0",
         "vlucas/phpdotenv": "^5.5"
     },
@@ -41,8 +43,12 @@
         }
     },
     "scripts": {
+        "check-cs": "ecs check --ansi",
+        "fix-cs": "ecs check --ansi --fix",
         "phpstan": "phpstan analyse --memory-limit=256M",
+        "rector": "rector process --ansi",
         "check": [
+            "@check-cs",
             "@phpstan",
             "@test"
         ]

@@ -22,7 +22,7 @@ class Logger
         string $message,
         string $level = 'info',
         mixed $data = null,
-        string $category = 'boarding'
+        string $category = 'boarding',
     ): void {
         try {
             $logEntry = self::formatLogEntry(
@@ -60,7 +60,7 @@ class Logger
         string $message,
         string $level,
         mixed $data = null,
-        string $category = 'boarding'
+        string $category = 'boarding',
     ): string {
         $timestamp = date('Y-m-d H:i:s');
         $logData = [
@@ -111,7 +111,7 @@ class Logger
             return;
         }
         // Sort by filename (date)
-        usort($files, function ($a, $b) {
+        usort($files, function($a, $b) {
             return strcmp($b, $a);
         });
         // Keep only the most recent MAX_LOG_DAYS
@@ -128,7 +128,7 @@ class Logger
         string $message,
         string $level,
         mixed $data = null,
-        string $category = 'boarding'
+        string $category = 'boarding',
     ): void {
         $logMessage = $message;
         if ($data !== null) {
@@ -158,7 +158,7 @@ class Logger
     public static function info(
         string $message,
         mixed $data = null,
-        string $category = 'boarding'
+        string $category = 'boarding',
     ): void {
         self::log($message, 'info', $data, $category);
     }
@@ -166,7 +166,7 @@ class Logger
     public static function warning(
         string $message,
         mixed $data = null,
-        string $category = 'boarding'
+        string $category = 'boarding',
     ): void {
         self::log($message, 'warning', $data, $category);
     }
@@ -174,7 +174,7 @@ class Logger
     public static function error(
         string $message,
         mixed $data = null,
-        string $category = 'boarding'
+        string $category = 'boarding',
     ): void {
         self::log($message, 'error', $data, $category);
     }
@@ -182,7 +182,7 @@ class Logger
     public static function debug(
         string $message,
         mixed $data = null,
-        string $category = 'boarding'
+        string $category = 'boarding',
     ): void {
         self::log($message, 'debug', $data, $category);
     }

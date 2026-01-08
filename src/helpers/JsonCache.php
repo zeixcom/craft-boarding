@@ -6,7 +6,7 @@ use zeix\boarding\utils\Logger;
 
 /**
  * JsonCache - Request-scoped JSON decoding cache
- * 
+ *
  * This class eliminates redundant JSON decoding by caching decoded results
  * within the request lifecycle, improving performance when the same JSON
  * data is accessed multiple times.
@@ -29,7 +29,7 @@ class JsonCache
 
     /**
      * Decode JSON with caching support
-     * 
+     *
      * @param string $json JSON string to decode
      * @param bool $associative Whether to return associative array
      * @param string|null $context Optional context for cache key uniqueness
@@ -62,7 +62,6 @@ class JsonCache
 
             self::$cache[$cacheKey] = $decoded;
             return $decoded;
-
         } catch (\Exception $e) {
             self::$stats['errors']++;
             Logger::error('Exception during JSON decode: ' . $e->getMessage(), 'boarding');
@@ -72,7 +71,7 @@ class JsonCache
 
     /**
      * Decode tour data JSON with tour-specific caching
-     * 
+     *
      * @param array $tour Tour data array
      * @param string $field Field name containing JSON (default: 'data')
      * @return array Decoded tour data
@@ -91,7 +90,7 @@ class JsonCache
 
     /**
      * Decode translation data JSON with translation-specific caching.
-     * 
+     *
      * @param array $translation Translation data array
      * @param int|null $siteId Site ID for context
      * @return array Decoded translation data
@@ -112,7 +111,7 @@ class JsonCache
 
     /**
      * Decode tour steps with caching.
-     * 
+     *
      * @param array $tour Tour data array
      * @return array Tour steps array
      */
@@ -124,7 +123,7 @@ class JsonCache
 
     /**
      * Get or decode tour field with caching.
-     * 
+     *
      * @param array $tour Tour data array
      * @param string $fieldName Field name to extract from decoded data
      * @param mixed $default Default value if field not found
@@ -138,7 +137,7 @@ class JsonCache
 
     /**
      * Merge decoded JSON tour data into tour array (avoiding duplicate decoding).
-     * 
+     *
      * @param array $tour Tour data array
      * @return array Tour array with JSON data merged in
      */
@@ -199,7 +198,7 @@ class JsonCache
 
     /**
      * Clear the JSON cache.
-     * 
+     *
      * @return void
      */
     public static function clearCache(): void
@@ -214,7 +213,7 @@ class JsonCache
 
     /**
      * Get cache statistics.
-     * 
+     *
      * @return array Cache statistics
      */
     public static function getStats(): array
@@ -236,7 +235,7 @@ class JsonCache
 
     /**
      * Generate cache key for JSON data.
-     * 
+     *
      * @param string $json JSON string
      * @param bool $associative Whether associative array was requested
      * @param string|null $context Optional context

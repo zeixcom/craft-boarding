@@ -9,7 +9,7 @@ use craft\db\Table;
 
 /**
  * Migration to properly integrate tours with Craft's element system
- * 
+ *
  * This migration:
  * 1. Ensures all tours have proper element table entries
  * 2. Creates elements_sites entries for all tours
@@ -202,4 +202,3 @@ class m251020_120000_integrate_craft_elements extends Migration
         }
     }
 }
-

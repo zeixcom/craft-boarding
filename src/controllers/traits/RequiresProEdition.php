@@ -3,8 +3,8 @@
 namespace zeix\boarding\controllers\traits;
 
 use Craft;
-use zeix\boarding\Boarding;
 use yii\web\ForbiddenHttpException;
+use zeix\boarding\Boarding;
 
 /**
  * RequiresProEdition Trait
@@ -25,7 +25,7 @@ trait RequiresProEdition
         if (!Boarding::getInstance()->is(Boarding::EDITION_PRO)) {
             throw new ForbiddenHttpException(
                 Craft::t('boarding', '{feature} requires Boarding Pro.', [
-                    'feature' => $featureName
+                    'feature' => $featureName,
                 ])
             );
         }

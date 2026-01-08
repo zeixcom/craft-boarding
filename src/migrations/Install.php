@@ -140,7 +140,7 @@ class Install extends Migration
             'boarding:createtours',
             'boarding:edittours',
             'boarding:deletetours',
-            'boarding:managetoursettings'
+            'boarding:managetoursettings',
         ];
 
         foreach ($permissions as $permission) {

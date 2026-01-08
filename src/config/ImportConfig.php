@@ -33,7 +33,7 @@ class ImportConfig
         'text/comma-separated-values',
         'application/xml',
         'text/xml',
-        'application/octet-stream' // Some browsers may use this for .json, .csv or .xml files
+        'application/octet-stream', // Some browsers may use this for .json, .csv or .xml files
     ];
 
     /**

@@ -7,7 +7,7 @@ use zeix\boarding\utils\Logger;
 
 /**
  * DatabaseSchemaHelper - Centralized database schema checking
- * 
+ *
  * This class provides consistent methods for checking column existence and
  * caching results to avoid repeated database queries.
  */
@@ -21,7 +21,7 @@ class DatabaseSchemaHelper
 
     /**
      * Check if the progressPosition column exists in the tours table
-     * 
+     *
      * @return bool
      */
     public static function hasProgressPositionColumn(): bool
@@ -31,7 +31,7 @@ class DatabaseSchemaHelper
 
     /**
      * Check if the autoplay column exists in the tours table
-     * 
+     *
      * @return bool
      */
     public static function hasAutoplayColumn(): bool
@@ -41,7 +41,7 @@ class DatabaseSchemaHelper
 
     /**
      * Get all available column information for tours table
-     * 
+     *
      * @return array Column existence information
      */
     public static function getAvailableColumns(): array
@@ -54,7 +54,7 @@ class DatabaseSchemaHelper
 
     /**
      * Check if a column exists in a table with caching
-     * 
+     *
      * @param string $table Table name
      * @param string $column Column name
      * @return bool

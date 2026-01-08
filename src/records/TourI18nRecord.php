@@ -7,7 +7,7 @@ use yii\db\ActiveQueryInterface;
 
 /**
  * TourI18nRecord represents a tour translation record in the database.
- * 
+ *
  * @property int $id ID
  * @property int $tourId Tour ID
  * @property int $siteId Site ID
@@ -60,4 +60,4 @@ class TourI18nRecord extends ActiveRecord
     {
         return $this->hasOne(\craft\records\Site::class, ['id' => 'siteId']);
     }
-} 
+}
