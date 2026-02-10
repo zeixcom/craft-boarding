@@ -49,8 +49,6 @@ class SiteHelper
 
         Craft::$app->getSites()->setCurrentSite($site);
 
-        Craft::$app->language = $site->language;
-
         return $site;
     }
 
